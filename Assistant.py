@@ -5,7 +5,7 @@ from enums.requests_enum import RequestEnum
 from group_persons import *
 from group_queue.history import History
 from group_queue.queue import Queue
-
+from schedule.schedule_from_file import ScheduleFromFile
 
 class Assistant:
 
@@ -17,16 +17,18 @@ class Assistant:
                                              CommandEnum.person_passed,
                                              CommandEnum.get_queue,
                                              CommandEnum.now_mode,
-                                             CommandEnum.new_queue]
+                                             CommandEnum.new_queue,
+                                             CommandEnum.schedule]
         self.now_mode = ModeEnum.DEFAULT
         self.last_mode = ModeEnum.DEFAULT
         self.queue = Queue()
         self.last_question = None
         self.last_command = None
-        self.last_ask_yes_no_ans = None     # После завершения всегда присваивать None
-        self.last_get_number_ans = None     # После завершения всегда присваивать None
+        self.last_ask_yes_no_ans = None  # После завершения всегда присваивать None
+        self.last_get_number_ans = None  # После завершения всегда присваивать None
         self.future_def = self.default_def  # функция которая исполнится первым
         self.not_readable_commands = []
+        self.schedule = ScheduleFromFile()
 
     def default_def(self):
         pass
@@ -93,12 +95,14 @@ class Assistant:
         # Command identify
 
         if from_id is None:
+            not_possible_command = True
             for cmd in self.from_group_possible_commands:
-                if command['text'] in cmd.value:
+                if command['text'] in cmd.value or command['text'].split()[0] in cmd.value:
                     command["command_enum"] = cmd
                     command["message_enum"] = MessageEnum.send_to_group
-                else:
-                    return "Эта команда недопустима для группы"
+                    not_possible_command = False
+            if not_possible_command:
+                return "Недопустимая команда для группы!"
         else:
             command['from_id'] = from_id
             for cmd in CommandEnum:
@@ -140,6 +144,24 @@ class Assistant:
 
             self.now_mode = self.last_mode
             return self.command(self.last_command)
+
+        if self.now_mode == ModeEnum.DEFAULT:
+            if len(command['text'].split()) > 1:
+                if command['text'].split()[0] in CommandEnum.schedule.value:
+                    if command['text'].split()[1] == "завтра":
+                        return self.schedule.get_schedule(1)
+                    if len(command['text'].split())> 2:
+                        if command['text'].split()[1] == "на" and command['text'].split()[2] == "завтра":
+                            return self.schedule.get_schedule(1)
+                    try:
+                        return self.schedule.get_schedule(int(command['text'].split()[1]))
+                    except TypeError:
+                        return "Неверный формат[TP]! Расписание <через k: int дней>/<на завтра>"
+                    except ValueError:
+                        return "Неверный формат[VE]! Расписание <через k: int дней>/<на завтра>"
+            if command['text'] in CommandEnum.schedule.value:
+                return self.schedule.get_schedule()
+
         if self.now_mode == ModeEnum.REQUEST:
             if command['text'] in RequestEnum.SWAP.value:
                 if self.last_get_number_ans is None:
@@ -171,7 +193,7 @@ class Assistant:
                 print("history")
                 result = ""
                 for i in self.queue.history.get_history():
-                    result += i +"\n"
+                    result += i + "\n"
 
                 return result
 
@@ -243,8 +265,3 @@ class Assistant:
                 "command_enum": CommandEnum.unknown,
                 "mode": now_mode,
                 "from_id": None}
-
-
-
-
-

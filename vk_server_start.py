@@ -42,7 +42,6 @@ def start():
 
             print('Новое сообщение:')
 
-            print(event)
             if event.group_id:
                 pass
             print('Текст: ', event.object.text, end="\n")
@@ -97,6 +96,23 @@ def get_id_by_vkid(vkid):
 
 
 print("Server runned...")
+
+
+def mainloop(exceptions=0):
+    if exceptions > 9:
+        vk_s.messages.send(peer_id=255396611,
+                           message="Произошло больше 9 ошибок. Отключаю сервер...")
+        return
+
+    try:
+        start()
+    except Exception:
+        vk_s.messages.send(peer_id=255396611,
+                           message="Произошла ошибка! Перезапускаюсь!")
+        mainloop(exceptions+1)
+
+
 start()
+
 
 
