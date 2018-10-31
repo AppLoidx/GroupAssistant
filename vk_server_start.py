@@ -25,7 +25,7 @@ def start():
         # Новое сообщение
         if event.type == VkBotEventType.MESSAGE_NEW:
 
-            if event.object.from_id not in ids:
+            if str(event.object.from_id) not in ids:
                 ids[str(event.object.from_id)] = Assistant(event.object.from_id, get_id_by_vkid(str(event.object.from_id)))
 
             print('Новое сообщение:')
@@ -54,11 +54,14 @@ def do_requests_list():
             if req[1] == "swap":
                 vkid = get_vkid_by_id(req[2])
                 if vkid is not None:
-                    #try:
-                    print("$$swap "+str(req[2]) + " " + str(req[3]))
-                    return ids[vkid].command("$$swap "+str(req[2]) + " " + str(req[3]))
-                    #except KeyError:
-                    #print("Key Error")
+                    try:
+                        print("$$swap "+str(req[2]) + " " + str(req[3]))
+                        print(ids)
+                        print(vkid)
+                        return ids[str(vkid)].command("$$swap "+str(req[2]) + " " + str(req[3]))
+                    except KeyError:
+                        print("Key Error")
+                        return None
 
 
 def get_vkid_by_id(id):
