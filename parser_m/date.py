@@ -1,16 +1,20 @@
 from parser_m.parser import Parser
 import requests
 
+
 class Date(Parser):
 
     def __init__(self):
 
         super().__init__()
 
-
     @staticmethod
     def get_time():
-        res = requests.get("http://api.timezonedb.com/v2.1/get-time-zone?key=CJ8I7RTKYXDD&by=zone&zone=Europe/Moscow&format=json")
+        res = requests.get("http://api.timezonedb.com/v2.1/get-time-zone?"
+                           "key=CJ8I7RTKYXDD&"
+                           "by=zone&"
+                           "zone=Europe/Moscow&"
+                           "format=json")
         res = res.json()
         return res['formatted'].split()[1]
 

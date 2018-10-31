@@ -4,7 +4,18 @@ import vk_api.vk_api
 from vk_api.bot_longpoll import VkBotLongPoll
 from vk_api.bot_longpoll import VkBotEventType
 from config import group_vk_api_token
+from editor.json_file import JSONFile
 from parser_m.parser import Parser
+
+
+def set_persons(filename="groupList.json"):
+    data = JSONFile.read_json(filename)
+    res = {}
+    for info in data['Persons']:
+        res[data["Persons"][info]['vkid']] = Assistant(data["Persons"][info]['vkid'], info)
+
+    return res
+
 
 parser = Parser()
 
@@ -14,7 +25,8 @@ vk_s = vk.get_api()
 
 longpoll = VkBotLongPoll(vk, 173296780)
 
-ids = {}
+
+ids = set_persons()
 
 
 def start():
@@ -30,6 +42,7 @@ def start():
 
             print('Новое сообщение:')
 
+            print(event)
             if event.group_id:
                 pass
             print('Текст: ', event.object.text, end="\n")
@@ -38,52 +51,52 @@ def start():
             vk_s.messages.send(peer_id=event.object.peer_id,
             message=None)
             """
-            vk_s.messages.send(peer_id=event.object.peer_id,
-                               message=ids[str(event.object.from_id)].command(
-                                   Edit.clean_str_from_symbol(event.object.text, "[", "]").strip(" ")))
+            if event.object.id == 0:
+                vk_s.messages.send(peer_id=event.object.peer_id,
+                                   message=ids[str(event.object.from_id)].command(
+                                       Edit.clean_str_from_symbol(event.object.text, "[", "]").strip(" ")))
+            else:
+                vk_s.messages.send(peer_id=event.object.peer_id,
+                                   message=ids[str(event.object.from_id)].command(
+                                       Edit.clean_str_from_symbol(event.object.text, "[", "]").strip(" "),
+                                       event.object.from_id))
 
 
-def do_requests_list():
-    f = open("requests_list.txt", "r", encoding="UTF-8")
-    data = f.read().split("\n")
-    for req in data:
-        if req == "":
-            continue
-        req = req.split()
-        if req[0] == "queue":
-            if req[1] == "swap":
-                vkid = get_vkid_by_id(req[2])
-                if vkid is not None:
-                    try:
-                        print("$$swap "+str(req[2]) + " " + str(req[3]))
-                        print(ids)
-                        print(vkid)
-                        return ids[str(vkid)].command("$$swap "+str(req[2]) + " " + str(req[3]))
-                    except KeyError:
-                        print("Key Error")
-                        return None
+def do_requests_list(filename="request_list.json"):
+    data = JSONFile.read_json(filename)
+    for request_type in data["request"]:
+        index = 0
+        max_value_index = len(data['request'][request_type])
+        while index < max_value_index:
+            swap_c = data['request'][request_type][index].split()
+            cmd = "$$swap " + swap_c[0] + " " + swap_c[1]
+
+            ids[get_vkid_by_id(swap_c[0])].command(cmd)
+
+            del data['request'][request_type][index]
+            max_value_index -= 1
+
+            index += 1
+
+            if index == max_value_index:
+                break
+
+    JSONFile.set_json_data(data,filename)
 
 
 def get_vkid_by_id(id):
-    f = open("groupList.txt", "r", encoding="UTF-8")
-    data = f.read().split("\n")
-    for p in data:
-        p = p.split()
-        if len(p) > 3:
-            if p[0] == id:
-                return p[3]
-    return None
+    data = JSONFile.read_json("groupList.json")
+    return data["Persons"][id]['vkid']
 
 
 def get_id_by_vkid(vkid):
-    f = open("groupList.txt", "r", encoding="UTF-8")
-    data = f.read().split("\n")
-    for p in data:
-        p = p.split()
-        if len(p) > 3:
-            if p[3] == vkid:
-                return p[0]
-    return None
+    data = JSONFile.read_json("groupList.json")
+    for id in data['Persons']:
+        if data["Persons"][id]['vkid'] == vkid:
+            return id
+
 
 print("Server runned...")
 start()
+
+

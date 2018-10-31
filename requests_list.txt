@@ -1,11 +1,2 @@
-queue swap 20 26 False
-queue swap 11 17 False
-queue swap 3 24 False
-queue swap 11 11 False
-queue swap 2 17 False
-queue swap 4 17 False
-queue swap 26 17 False
-queue swap 2 16 False
-queue swap 16 3 False
-queue swap 16 3 False
-queue swap 16 4 False
+queue swap 16 16 False
+queue swap 16 16 False

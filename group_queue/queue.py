@@ -17,9 +17,6 @@ class Queue:
         # Работа с историей
         self.history = History()
 
-        # Для работы со временем
-        self.date = Date()
-
     @staticmethod
     def exist_check(filename="queue.txt"):
 
@@ -123,7 +120,7 @@ class Queue:
         self._queue_list[self._queue_value].set_passed(True)
         self.history.write(f"{self._queue_list[self._queue_value].get_id()}"
                            f" {self._queue_list[self._queue_value].get_name()}"
-                           f" прошел очередь в {self.date.get_time()}")
+                           f" прошел очередь в {Date.get_time()}")
         self._queue_value += 1
 
         # При переполнении
@@ -186,7 +183,7 @@ class Queue:
         """
         person_position = self.get_person_queue_position(person_id) - 1
         del self._queue_list[person_position]
-        self.history.write(f"{self._queue_list[person_position].get_name()} удален из очереди в {self.date.get_time()}")
+        self.history.write(f"{self._queue_list[person_position].get_name()} удален из очереди в {Date.get_time()}")
 
     def add_person(self, person_id: str, position: int=-1):
 
@@ -197,7 +194,7 @@ class Queue:
                 if person.get_id() == person_id:
                     self._queue_list.append(person)
 
-                    self.history.write(f"В конец очереди добавлен {person.get_name()} в {self.date.get_time()}")
+                    self.history.write(f"В конец очереди добавлен {person.get_name()} в {Date.get_time()}")
 
         elif position == len(self._queue_list) + 1:
             for person in self._GROUP_LIST:
@@ -205,7 +202,7 @@ class Queue:
                     self._queue_list.append(person)
                     self.history.write(f"В позицию {position}"
                                        f" добавлен {person.get_name()} в"
-                                       f" {self.date.get_time()}")
+                                       f" {Date.get_time()}")
 
         else:
             for i in range(len(self._queue_list)):
@@ -215,7 +212,7 @@ class Queue:
                             new_queue_list.append(person)
                             self.history.write(f"В позицию {position}"
                                                f" добавлен {person.get_name()} в"
-                                               f" {self.date.get_time()}")
+                                               f" {Date.get_time()}")
 
                 new_queue_list.append(self._queue_list[i])
 
@@ -240,7 +237,7 @@ class Queue:
                         self.history.write(f"Поменялись местами: "
                                            f"{self._queue_list[index1].get_name()} <-> "
                                            f"{self._queue_list[index2].get_name()}"
-                                           f" в {self.date.get_time()}")
+                                           f" в {Date.get_time()}")
 
                         return
 

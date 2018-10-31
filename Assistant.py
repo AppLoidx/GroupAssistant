@@ -14,15 +14,10 @@ class Assistant:
         self.isu_id = isu_id
         self.persons = get_group_persons()
         self.from_group_possible_commands = [CommandEnum.get_history,
-                                             CommandEnum.get_current_person_in_queue,
-                                             CommandEnum.get_last_person_in_queue,
-                                             CommandEnum.get_next_person_in_queue,
                                              CommandEnum.person_passed,
                                              CommandEnum.get_queue,
                                              CommandEnum.now_mode,
-                                             CommandEnum.swap_request,
-                                             CommandEnum.new_queue,
-                                             CommandEnum.swap_request]
+                                             CommandEnum.new_queue]
         self.now_mode = ModeEnum.DEFAULT
         self.last_mode = ModeEnum.DEFAULT
         self.queue = Queue()
@@ -45,19 +40,31 @@ class Assistant:
         return [False, ModeEnum.UNKNOWN]
 
     def change_mode(self, to_mode):
+        """ Изменяет мод, для следующего поступающего потока команд"""
         self.last_mode = self.now_mode
         self.now_mode = to_mode
 
     def command(self, command, from_id=None) -> any:
+        """
 
-        print(self.now_mode)
-        """ Если from_id = None, то сообщение из группы"""
+        Сюда вводятся все команды пользователя. Команды разделены на моды,
+        чтобы не было конфликтов среди имен и лишних взаимодействий с ботом.
+
+        :param command: команда вводимая пользователем или "супер"-команда
+        :param from_id: Если None, то сообщение из группы, если есть значение, то личное
+        :return: вывод (ответ бота)
+        """
+
         if command == "":
             command = "unknown"
         if command is None:
             print("Command is None")
+
+        # Обработка нечитаемых событий
         if command in self.not_readable_commands:
             return
+
+        # Обработка особых событий
         if len(command) > 2:
             if command[0:2:] == "$$":
                 if command[2:6] == "swap":
@@ -66,7 +73,7 @@ class Assistant:
                         # TODO mod change()
                         self.change_mode(ModeEnum.YES_NO_ASK)
                         self.last_command = command
-                        return "Вы хотите поменяться местами с номером ИСУ " + command.split()[1] + "?"
+                        return "Вы хотите поменяться местами с номером ИСУ " + command.split()[2] + "?"
                     else:
                         if self.last_ask_yes_no_ans:
                             if self.queue.exist_check():
@@ -74,10 +81,11 @@ class Assistant:
                                 self.queue.swap(command[1], command[2])
                                 self.queue.write_queue_on_file()
                                 self.last_ask_yes_no_ans = None
-                                self.not_readable_commands.append(command)
                                 return "Успешно!"
                             else:
                                 return "Очереди нет"
+                        else:
+                            return "Вы отклонили запрос!"
 
         command = self.set_command(command, self.now_mode)
 
@@ -89,6 +97,8 @@ class Assistant:
                 if command['text'] in cmd.value:
                     command["command_enum"] = cmd
                     command["message_enum"] = MessageEnum.send_to_group
+                else:
+                    return "Эта команда недопустима для группы"
         else:
             command['from_id'] = from_id
             for cmd in CommandEnum:
