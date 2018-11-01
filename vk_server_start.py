@@ -112,19 +112,4 @@ def mainloop(exceptions=0):
         mainloop(exceptions + 1)
 
 
-import json
-
-f = json.load(open("groupList.json", "r", encoding="UTF-8"))
-
-for person in f['Persons']:
-    vkid = f['Persons'][person]['vkid']
-    name = f['Persons'][person]['name']
-
-    if vkid is not None:
-        message = f"Если вы не {name}, то сообщите об этом Артуру через личные сообщения и укажите правильный vkid" \
-                  " А если это вы то все хорошо. Также посмотрите: https://vk.com/wall-173296780_2"
-        try:
-            vk_s.messages.send(peer_id=int(vkid),
-                               message=message)
-        except vk_api.exceptions.ApiError:
-            pass
+mainloop()
