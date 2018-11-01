@@ -1,9 +1,16 @@
+
+import vk_api.vk_api
 from Assistant import Assistant
 from editor.editor import Edit
-import vk_api.vk_api
+
+
 from vk_api.bot_longpoll import VkBotLongPoll
 from vk_api.bot_longpoll import VkBotEventType
+
 from config import group_vk_api_token
+from config import admin_vk_id
+from config import group_id
+
 from editor.json_file import JSONFile
 from parser_m.parser import Parser
 
@@ -23,7 +30,7 @@ token = group_vk_api_token  # access_token
 vk = vk_api.VkApi(token=token)
 vk_s = vk.get_api()
 
-longpoll = VkBotLongPoll(vk, 173296780)
+longpoll = VkBotLongPoll(vk, group_id)
 
 ids = set_persons()
 
@@ -100,14 +107,14 @@ print("Server runned...")
 
 def mainloop(exceptions=0):
     if exceptions > 9:
-        vk_s.messages.send(peer_id=255396611,
+        vk_s.messages.send(peer_id=admin_vk_id,
                            message="Произошло больше 9 ошибок. Отключаю сервер...")
         return
 
     try:
         start()
     except Exception:
-        vk_s.messages.send(peer_id=255396611,
+        vk_s.messages.send(peer_id=admin_vk_id,
                            message="Произошла ошибка! Перезапускаюсь!")
         mainloop(exceptions + 1)
 
