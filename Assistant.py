@@ -1,3 +1,4 @@
+from associates.associator import Associate
 from enums.command_enum import CommandEnum
 from enums.mode_enum import ModeEnum
 from enums.message_enum import MessageEnum
@@ -6,6 +7,7 @@ from group_persons import *
 from group_queue.queue import Queue
 from schedule.schedule_from_file import ScheduleFromFile
 from editor.json_file import JSONFile
+from questions.get_question import GetQuestionJava
 
 class Assistant:
 
@@ -19,6 +21,7 @@ class Assistant:
                                              CommandEnum.now_mode,
                                              CommandEnum.new_queue,
                                              CommandEnum.schedule]
+
         self.now_mode = ModeEnum.DEFAULT
         self.last_mode = ModeEnum.DEFAULT
         self.queue = Queue()
@@ -29,6 +32,7 @@ class Assistant:
         self.future_def = self.default_def  # функция которая исполнится первым
         self.not_readable_commands = []
         self.schedule = ScheduleFromFile()
+        self.java_question = GetQuestionJava()
 
     def default_def(self):
         pass
@@ -94,6 +98,12 @@ class Assistant:
         self.future_def()
         # Command identify
 
+        change_mode = self.identify_mode_change(command['text'])
+        if change_mode[0]:
+            self.change_mode(change_mode[1])
+            print(self.now_mode, "=now mode")
+            return "Режим успешно изменён"
+
         if from_id is None:
             not_possible_command = True
             for cmd in self.from_group_possible_commands:
@@ -110,13 +120,7 @@ class Assistant:
                     command["command_enum"] = cmd
                     command["message_enum"] = MessageEnum.send_to_person
 
-        print(command)
-        change_mode = self.identify_mode_change(command['text'])
-        print(change_mode)
-        if change_mode[0]:
-            self.change_mode(change_mode[1])
-            print(self.now_mode, "=now mode")
-            return "Режим успешно изменён"
+
 
         command_type = command['command_enum']
 
@@ -145,7 +149,23 @@ class Assistant:
             self.now_mode = self.last_mode
             return self.command(self.last_command)
 
+#
+#              MAIN COMMANDS
+#
+
+# QUESTION MODE
+        if self.now_mode == ModeEnum.QUESTION:
+            if command['text'] in CommandEnum.get_java_question.value:
+                return self.java_question.get_question()[1]
+            elif command['text'] in CommandEnum.get_java_answer.value:
+                return self.java_question.last_answer
+            else:
+                return "Не могу распознать вашу команду, простите."
+# DEFAULT MODE
         if self.now_mode == ModeEnum.DEFAULT:
+
+            # schedule
+
             if len(command['text'].split()) > 1:
                 if command['text'].split()[0] in CommandEnum.schedule.value:
                     if command['text'].split()[1] == "завтра":
@@ -162,6 +182,20 @@ class Assistant:
             if command['text'] in CommandEnum.schedule.value:
                 return self.schedule.get_schedule()
 
+            # journal link
+
+            if len(command['text'].split()) > 1:
+                if command['text'].split()[0] in CommandEnum.get_journal_link.value:
+                    data = JSONFile.read_json("links.json")
+
+                    associate = Associate.get_associate(command['text'].split()[1])
+                    if isinstance(associate, Exception):
+                        return "У меня тут что-то пошло не так... Вы все правильно ввели?"
+                    if associate is None:
+                        return "Не нашла такого журнала в своей базе данных..."
+                    return data['journals'][associate]
+
+# REQUEST MODE
         if self.now_mode == ModeEnum.REQUEST:
             if command['text'] in RequestEnum.SWAP.value:
                 if self.last_get_number_ans is None:
@@ -183,6 +217,8 @@ class Assistant:
                     return res
 
         print(command_type)
+
+# QUEUE MODE
         if self.now_mode == ModeEnum.QUEUE:
 
             if command_type == CommandEnum.new_queue:

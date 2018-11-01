@@ -71,6 +71,7 @@ class JSONFile:
         f = open(filename, "w", encoding="UTF-8")
         f.write(json.dumps(data, ensure_ascii=False))
         f.close()
+
     @staticmethod
     def get_vkid_by_id(id):
         data = JSONFile.read_json("groupList.json")

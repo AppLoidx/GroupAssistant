@@ -1,0 +1,6 @@
+{
+  "journal": ["journal", "журнал", "оценки"],
+  "programming": ["programming","прога","программирование", "prog"],
+  "cpb": ["cpb", "opd", "опд"],
+  "informatics": ["informatics", "inf", "инф", "инфа", "информатика"]
+}

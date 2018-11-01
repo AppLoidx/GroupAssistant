@@ -24,6 +24,8 @@ def set_persons(filename="groupList.json"):
     return res
 
 
+print("connection to vk API...")
+
 parser = Parser()
 
 token = group_vk_api_token  # access_token
@@ -102,7 +104,7 @@ def get_id_by_vkid(vkid):
             return id
 
 
-print("Server runned...")
+print("Server working...")
 
 
 def mainloop(exceptions=0):
@@ -113,10 +115,16 @@ def mainloop(exceptions=0):
 
     try:
         start()
+
     except Exception:
         vk_s.messages.send(peer_id=admin_vk_id,
                            message="Произошла ошибка! Перезапускаюсь!")
         mainloop(exceptions + 1)
 
 
-mainloop()
+start()
+
+""" Notes
+
+requests.exceptions.ConnectionError
+"""

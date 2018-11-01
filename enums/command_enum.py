@@ -3,11 +3,16 @@ from enum import Enum
 
 class CommandEnum(Enum):
 
+    # Вывод текущего режима
+    now_mode = ["текущий режим", "режим", "mode", "now mode"]
+
+    # Default mode
     # Расписание
     schedule = ["schedule", "расписание"]
 
-    # Вывод текущего режима
-    now_mode = ["текущий режим", "режим", "mode", "now mode"]
+    # Links
+    get_journal_link = ["журнал", "journal"]
+
     # Работа с очередью
     # Main functions
     swap = ["поменять", "swap"]
@@ -28,7 +33,8 @@ class CommandEnum(Enum):
     delete_person_request = ["delete_person"]
 
     # Вопросы (про Java и тд)
-    java_question = ["java"]
+    get_java_question = ["java", "джава"]
+    get_java_answer = ["ответ", "answer"]
 
     # Неизвестная команда
     unknown = ["unknown"]

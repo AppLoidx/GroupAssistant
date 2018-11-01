@@ -2,7 +2,8 @@ from enum import Enum
 
 
 class ModeEnum(Enum):
-    QUESTION = ["режим вопросов", "вопросы", "вопрос", "questions"]
+
+    QUESTION = ["режим вопросов", "вопросы", "вопрос", "questions", "question"]
 
     QUEUE = ["режим очереди", "очередь", "queue"]
     DEFAULT = ["обычный режим", "default", "обычный", "выйти", "закончить"]
