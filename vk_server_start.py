@@ -25,7 +25,6 @@ vk_s = vk.get_api()
 
 longpoll = VkBotLongPoll(vk, 173296780)
 
-
 ids = set_persons()
 
 
@@ -38,7 +37,8 @@ def start():
         if event.type == VkBotEventType.MESSAGE_NEW:
 
             if str(event.object.from_id) not in ids:
-                ids[str(event.object.from_id)] = Assistant(event.object.from_id, get_id_by_vkid(str(event.object.from_id)))
+                ids[str(event.object.from_id)] = Assistant(event.object.from_id,
+                                                           get_id_by_vkid(str(event.object.from_id)))
 
             print('Новое сообщение:')
 
@@ -80,7 +80,7 @@ def do_requests_list(filename="request_list.json"):
             if index == max_value_index:
                 break
 
-    JSONFile.set_json_data(data,filename)
+    JSONFile.set_json_data(data, filename)
 
 
 def get_vkid_by_id(id):
@@ -109,10 +109,22 @@ def mainloop(exceptions=0):
     except Exception:
         vk_s.messages.send(peer_id=255396611,
                            message="Произошла ошибка! Перезапускаюсь!")
-        mainloop(exceptions+1)
+        mainloop(exceptions + 1)
 
 
-start()
+import json
 
+f = json.load(open("groupList.json", "r", encoding="UTF-8"))
 
+for person in f['Persons']:
+    vkid = f['Persons'][person]['vkid']
+    name = f['Persons'][person]['name']
 
+    if vkid is not None:
+        message = f"Если вы не {name}, то сообщите об этом Артуру через личные сообщения и укажите правильный vkid" \
+                  " А если это вы то все хорошо. Также посмотрите: https://vk.com/wall-173296780_2"
+        try:
+            vk_s.messages.send(peer_id=int(vkid),
+                               message=message)
+        except vk_api.exceptions.ApiError:
+            pass

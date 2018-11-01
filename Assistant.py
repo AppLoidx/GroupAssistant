@@ -3,9 +3,9 @@ from enums.mode_enum import ModeEnum
 from enums.message_enum import MessageEnum
 from enums.requests_enum import RequestEnum
 from group_persons import *
-from group_queue.history import History
 from group_queue.queue import Queue
 from schedule.schedule_from_file import ScheduleFromFile
+from editor.json_file import JSONFile
 
 class Assistant:
 
@@ -169,12 +169,18 @@ class Assistant:
                     self.last_command = command['text']
                     return "Введите номер ИСУ с которым хотите поменяться:"
                 else:
-                    f = open("requests_list.txt", "a", encoding="UTF-8")
-                    f.write(f"queue swap {self.isu_id} {self.last_get_number_ans} False\n")
-                    f.close()
+
+                    if JSONFile.get_vkid_by_id(self.last_get_number_ans) is not None:
+                        f = open("requests_list.txt", "a", encoding="UTF-8")
+                        f.write(f"queue swap {self.isu_id} {self.last_get_number_ans} False\n")
+                        f.close()
+                        res = "Запрос отправлен"
+                    else:
+                        res = "Запрос не может быть выполнен, так как пользователь не указал vkid"
+
                     self.last_get_number_ans = None
                     self.now_mode = self.last_mode
-                    return "Запрос отпрвлен"
+                    return res
 
         print(command_type)
         if self.now_mode == ModeEnum.QUEUE:

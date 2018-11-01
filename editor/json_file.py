@@ -71,3 +71,14 @@ class JSONFile:
         f = open(filename, "w", encoding="UTF-8")
         f.write(json.dumps(data, ensure_ascii=False))
         f.close()
+    @staticmethod
+    def get_vkid_by_id(id):
+        data = JSONFile.read_json("groupList.json")
+        return data["Persons"][id]['vkid']
+
+    @staticmethod
+    def get_id_by_vkid(vkid):
+        data = JSONFile.read_json("groupList.json")
+        for index in data['Persons']:
+            if data["Persons"][id]['vkid'] == vkid:
+                return index
