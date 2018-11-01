@@ -234,6 +234,8 @@ class Queue:
                         self._queue_list[index1] = self._queue_list[index2]
                         self._queue_list[index2] = temp
 
+                        self.write_queue_on_file()
+
                         self.history.write(f"Поменялись местами: "
                                            f"{self._queue_list[index1].get_name()} <-> "
                                            f"{self._queue_list[index2].get_name()}"

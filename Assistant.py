@@ -9,9 +9,12 @@ from schedule.schedule_from_file import ScheduleFromFile
 from editor.json_file import JSONFile
 from questions.get_question import GetQuestionJava
 
+
 class Assistant:
 
-    def __init__(self, vkid, isu_id):
+    def __init__(self, vkid, isu_id, group_file_name):
+
+        self.group_file_name = group_file_name
         self.vkid = vkid
         self.isu_id = isu_id
         self.persons = get_group_persons()
@@ -60,6 +63,7 @@ class Assistant:
         :param from_id: Если None, то сообщение из группы, если есть значение, то личное
         :return: вывод (ответ бота)
         """
+        print(command)
 
         if command == "":
             command = "unknown"
@@ -79,15 +83,17 @@ class Assistant:
                         # TODO mod change()
                         self.change_mode(ModeEnum.YES_NO_ASK)
                         self.last_command = command
-                        return "Вы хотите поменяться местами с номером ИСУ " + command.split()[2] + "?"
+                        return "Вы хотите поменяться местами с номером ИСУ " + command.split()[1] + "? (" \
+                               + JSONFile.get_persons(self.group_file_name)[command.split()[1]]['name'] + ")"
                     else:
                         if self.last_ask_yes_no_ans:
                             if self.queue.exist_check():
                                 command = command.split()
                                 self.queue.swap(command[1], command[2])
                                 self.queue.write_queue_on_file()
+                                self.change_mode(ModeEnum.DEFAULT)
                                 self.last_ask_yes_no_ans = None
-                                return "Успешно!"
+                                return "Заявка принята!"
                             else:
                                 return "Очереди нет"
                         else:
@@ -102,7 +108,7 @@ class Assistant:
         if change_mode[0]:
             self.change_mode(change_mode[1])
             print(self.now_mode, "=now mode")
-            return "Режим успешно изменён"
+            return "Режим успешно изменён!\n Текущий режим: " + self.now_mode.value[0]
 
         if from_id is None:
             not_possible_command = True
@@ -119,8 +125,6 @@ class Assistant:
                 if command['text'] in cmd.value:
                     command["command_enum"] = cmd
                     command["message_enum"] = MessageEnum.send_to_person
-
-
 
         command_type = command['command_enum']
 
@@ -143,17 +147,17 @@ class Assistant:
             try:
                 self.last_get_number_ans = int(command['text'])
 
-            except TypeError:
+            except ValueError:
                 return "Введите цифру!"
 
             self.now_mode = self.last_mode
-            return self.command(self.last_command)
+            return self.command(self.last_command, from_id)
 
-#
-#              MAIN COMMANDS
-#
+        #
+        #              MAIN COMMANDS
+        #
 
-# QUESTION MODE
+        # QUESTION MODE
         if self.now_mode == ModeEnum.QUESTION:
             if command['text'] in CommandEnum.get_java_question.value:
                 return self.java_question.get_question()[1]
@@ -161,7 +165,7 @@ class Assistant:
                 return self.java_question.last_answer
             else:
                 return "Не могу распознать вашу команду, простите."
-# DEFAULT MODE
+        # DEFAULT MODE
         if self.now_mode == ModeEnum.DEFAULT:
 
             # schedule
@@ -170,7 +174,7 @@ class Assistant:
                 if command['text'].split()[0] in CommandEnum.schedule.value:
                     if command['text'].split()[1] == "завтра":
                         return self.schedule.get_schedule(1)
-                    if len(command['text'].split())> 2:
+                    if len(command['text'].split()) > 2:
                         if command['text'].split()[1] == "на" and command['text'].split()[2] == "завтра":
                             return self.schedule.get_schedule(1)
                     try:
@@ -195,7 +199,7 @@ class Assistant:
                         return "Не нашла такого журнала в своей базе данных..."
                     return data['journals'][associate]
 
-# REQUEST MODE
+        # REQUEST MODE
         if self.now_mode == ModeEnum.REQUEST:
             if command['text'] in RequestEnum.SWAP.value:
                 if self.last_get_number_ans is None:
@@ -204,21 +208,14 @@ class Assistant:
                     return "Введите номер ИСУ с которым хотите поменяться:"
                 else:
 
-                    if JSONFile.get_vkid_by_id(self.last_get_number_ans) is not None:
-                        f = open("requests_list.txt", "a", encoding="UTF-8")
-                        f.write(f"queue swap {self.isu_id} {self.last_get_number_ans} False\n")
-                        f.close()
-                        res = "Запрос отправлен"
-                    else:
-                        res = "Запрос не может быть выполнен, так как пользователь не указал vkid"
-
+                    JSONFile.add_request("swap", f"{self.isu_id} {self.last_get_number_ans}")
                     self.last_get_number_ans = None
                     self.now_mode = self.last_mode
-                    return res
+                    return "Успешно!"
 
         print(command_type)
 
-# QUEUE MODE
+        # QUEUE MODE
         if self.now_mode == ModeEnum.QUEUE:
 
             if command_type == CommandEnum.new_queue:

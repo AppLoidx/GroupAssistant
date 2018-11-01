@@ -63,7 +63,7 @@ class JSONFile:
         JSONFile.set_json_data(json_file, filename)
 
     @staticmethod
-    def get_persons(filename="groupList.json"):
+    def get_persons(filename):
         return json.load(open(filename, "r", encoding="UTF-8"))["Persons"]
 
     @staticmethod
@@ -73,13 +73,15 @@ class JSONFile:
         f.close()
 
     @staticmethod
-    def get_vkid_by_id(id):
-        data = JSONFile.read_json("groupList.json")
-        return data["Persons"][id]['vkid']
+    def get_vkid_by_id(idd, group_file_name):
+        data = JSONFile.read_json(group_file_name)
+        return data["Persons"][str(idd)]['vkid']
 
     @staticmethod
-    def get_id_by_vkid(vkid):
-        data = JSONFile.read_json("groupList.json")
+    def get_id_by_vkid(vkid, group_file_name):
+        data = JSONFile.read_json(group_file_name)
         for index in data['Persons']:
-            if data["Persons"][id]['vkid'] == vkid:
+            if data["Persons"][index]['vkid'] == str(vkid):
                 return index
+
+
