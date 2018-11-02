@@ -5,6 +5,9 @@ class CommandEnum(Enum):
 
     # Вывод текущего режима
     now_mode = ["текущий режим", "режим", "mode", "now mode"]
+    
+    # help
+    help = ["help", "хелп", "man"]
 
     # Default mode
     # Расписание

@@ -5,6 +5,7 @@ from enums.message_enum import MessageEnum
 from enums.requests_enum import RequestEnum
 from group_persons import *
 from group_queue.queue import Queue
+from manual.manual import Manual
 from schedule.schedule_from_file import ScheduleFromFile
 from editor.json_file import JSONFile
 from questions.get_question import GetQuestionJava
@@ -147,6 +148,9 @@ class Assistant:
 # Вывод текущего мода
         if command_type == CommandEnum.now_mode:
             return self.now_mode.value[0]
+
+        if command_type == CommandEnum.help:
+            return Manual.get_manual(self.now_mode)
 
         if self.now_mode == ModeEnum.YES_NO_ASK:
 
