@@ -1,5 +1,7 @@
 from editor.json_file import JSONFile
+from enums.mode_enum import ModeEnum
 from group_queue.queue import Queue
+from manual.manual import Manual
 from parser_m.date import Date
 
-print(JSONFile.get_vkid_by_id("8", "groups_list/P3112.json"))
+print(Manual.get_manual(ModeEnum.QUEUE))
