@@ -1,0 +1,33 @@
+{
+"one_time": false,
+"buttons": [
+[{
+"action": {
+"type": "text",
+"label": "/queue"
+},
+"color": "negative"
+},
+{
+"action": {
+"type": "text",
+"label": "queue"
+},
+"color": "positive"
+}],
+[{
+"action": {
+"type": "text",
+"label": "passed"
+},
+"color": "default"
+},
+{
+"action": {
+"type": "text",
+"label": "history"
+},
+"color": "primary"
+}]
+]
+}

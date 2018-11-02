@@ -20,6 +20,7 @@ def add_server(server: VkServer, dictionary):
 
 def run_all(dictionary):
     for server in dictionary:
+        #dictionary[server].start()
         dictionary[server].start()
         print(f"Server {server.get_server_name()} started!")
 

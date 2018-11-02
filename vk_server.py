@@ -9,7 +9,11 @@ from config import group_vk_api_token
 from config import admin_vk_id
 
 from editor.json_file import JSONFile
+from enums.mode_enum import ModeEnum
 from parser_m.parser import Parser
+
+from messenger.messenger import Messenger
+from spam import Spam
 
 
 class VkServer:
@@ -26,6 +30,10 @@ class VkServer:
         self.longpoll = VkBotLongPoll(self.vk, group_id)
 
         self.ids = self._set_persons(group_file_name)
+
+        self.messenger = Messenger(self.vk_s, self.ids)
+
+        self.spam = Spam(self.vk_s,self.ids,self.group_file_name)
 
         print("Server " + self.server_name + " working...")
 
@@ -47,7 +55,8 @@ class VkServer:
                 if str(event.object.from_id) not in self.ids:
                     self.ids[str(event.object.from_id)] = Assistant(event.object.from_id,
                                                                     JSONFile.get_id_by_vkid(str(event.object.from_id),
-                                                                                            self.group_file_name))
+                                                                                            self.group_file_name),
+                                                                    self.group_file_name)
 
                 print('Новое сообщение:')
 
@@ -59,34 +68,42 @@ class VkServer:
                 vk_s.messages.send(peer_id=event.object.peer_id,
                 message=None)
                 """
-                if event.object.id == 0:
-                    self.vk_s.messages.send(peer_id=event.object.peer_id,
-                                            message=self.ids[str(event.object.from_id)].command(
-                                                Edit.clean_str_from_symbol(event.object.text, "[", "]").strip(" ")))
+                if True:#event.object.from_id == admin_vk_id:
+                    if event.object.id == 0:
+                        self.ids[str(event.object.from_id)].change_mode(ModeEnum.QUEUE)
+                        self.messenger.send_message_by_event(event, keyboard="group.json")
+                    else:
+
+                        self.messenger.send_message_by_event(event, from_id=event.object.from_id)
+
                 else:
-                    self.vk_s.messages.send(peer_id=event.object.peer_id,
-                                            message=self.ids[str(event.object.from_id)].command(
-                                                Edit.clean_str_from_symbol(event.object.text, "[", "]").strip(" "),
-                                                event.object.from_id))
+                    self.messenger.send_message_by_event(event, str(JSONFile.get_name_by_vkid(event.object.from_id,
+                                                                                 self.group_file_name)) +
+                                                ", сейчас я нахожусь в тестовом режиме!")
 
     def do_requests_list(self, filename="request_list.json"):
         data = JSONFile.read_json(filename)
         for request_type in data["request"]:
             index = 0
             max_value_index = len(data['request'][request_type])
-            while index < max_value_index:
-                swap_c = data['request'][request_type][index].split()
-                cmd = "$$swap " + swap_c[0] + " " + swap_c[1]
+            if request_type == "swap":
+                while index < max_value_index:
+                    swap_c = data['request'][request_type][index].split()
+                    cmd = "$$swap " + swap_c[0] + " " + swap_c[1]
 
-                self.ids[JSONFile.get_vkid_by_id(swap_c[1], self.group_file_name)].command(cmd)
+                    self.ids[JSONFile.get_vkid_by_id(swap_c[1], self.group_file_name)].command(cmd)
 
-                del data['request'][request_type][index]
-                max_value_index -= 1
+                    del data['request'][request_type][index]
+                    max_value_index -= 1
 
-                index += 1
+                    index += 1
 
-                if index == max_value_index:
-                    break
+                    if index == max_value_index:
+                        break
+            elif request_type == "send2all":
+                if len(data['request']['send2all']) > 0:
+                    self.spam.send_spam(data['request']['send2all'])
+                    del data['request']['send2all'][0]
 
         JSONFile.set_json_data(data, filename)
 
@@ -99,14 +116,18 @@ class VkServer:
         try:
             self.start()
 
-        except Exception:
+        except Exception as e:
             self.vk_s.messages.send(peer_id=admin_vk_id,
-                                    message="Произошла ошибка! Перезапускаюсь!")
+                                    message="Произошла ошибка! Перезапускаюсь! " + e.__str__())
             self.mainloop(exceptions + 1)
 
     def get_server_name(self):
         return self.server_name
 
+    def spam_test(self):
+        self.spam.send_spam("Извините за беспокойство. Это тестовая рассылка объявлений всей группе. Эта функция будет"
+                            " доступна лишь для старосты и не будет использоваться как спам. Если вы хотите отказаться "
+                            "от подобной рассылки напишите в личку https://vk.com/apploidxxx")
 
 """ Notes
 

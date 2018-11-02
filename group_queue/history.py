@@ -29,5 +29,5 @@ class History:
         history = open(self.filename, "r", encoding="UTF-8")
         history = history.read().split("\n")
         self._re_open_file()
-        print("history: ",history)
+        print("history: ", history)
         return history

@@ -1,0 +1,60 @@
+{
+  "one_time": false,
+  "buttons": [
+    [{
+      "action": {
+        "type": "text",
+        "label": "/queue"
+      },
+      "color": "positive"
+    },
+      {
+        "action": {
+          "type": "text",
+          "label": "/question"
+        },
+        "color": "positive"
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "/request"
+        },
+        "color": "positive"
+      }],
+
+
+    [
+      {
+      "action": {
+        "type": "text",
+        "label": "расписание"
+      },
+      "color": "default"
+    }
+    ],
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "журнал опд"
+        },
+        "color": "default"
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "журнал прога"
+        },
+        "color": "default"
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "журнал инфа"
+        },
+        "color": "default"
+      }
+    ]
+  ]
+}

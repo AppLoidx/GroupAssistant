@@ -23,14 +23,15 @@ class CommandEnum(Enum):
     get_current_person_in_queue = ["сейчас", "current"]
     get_next_person_in_queue = ["следующий", "следующий в очереди", "next"]
     get_person_queue_position = ["место в очереди", "queue_position"]
+    add_person = ["add", "добавиться", "+"]
+    delete_person = ["delete", "удалиться", "-"]
 
     # Work with history
     get_history = ["history", "история"]
 
     # Requests
     swap_request = ["swap", "смена места в очереди", "смена"]
-    add_person_request = ["add_person"]
-    delete_person_request = ["delete_person"]
+
 
     # Вопросы (про Java и тд)
     get_java_question = ["java", "джава"]
@@ -38,3 +39,5 @@ class CommandEnum(Enum):
 
     # Неизвестная команда
     unknown = ["unknown"]
+
+    send_spam = ["сообщение для группы", "4all", "group message", "gm"]

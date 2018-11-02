@@ -1,5 +1,7 @@
 import os
 import random
+
+from editor.json_file import JSONFile
 from parser_m.date import Date
 from group_queue.person import Person
 from group_queue.history import History
@@ -7,7 +9,8 @@ from group_queue.history import History
 
 class Queue:
 
-    def __init__(self):
+    def __init__(self, group_file_name):
+        self.group_file_name = group_file_name
         self._queue_list = self._set_group_list()
         self._GROUP_LIST = self._queue_list
 
@@ -22,23 +25,17 @@ class Queue:
 
         return os.path.isfile(filename)
 
-    @staticmethod
-    def _set_group_list():
+    def _set_group_list(self):
         """
         Получает список группы из файла groupList.txt или groupListWindow.txt в зависимости от кодировки
         :return: сгенерированный список группы с элементами Person
         """
-        filename = "group_queue/groupList.txt"
 
-        file = open(filename, "r", encoding="UTF-8")
+        data = JSONFile.read_json(self.group_file_name)
         group_list = []
-        while True:
 
-            f = file.readline().split()
-            if not f:
-                break
-
-            group_list.append(Person(f[0], f"{f[1]} {f[2]}"))
+        for person in data["Persons"]:
+            group_list.append(Person(person, data["Persons"][person]["name"]))
 
         return group_list
 
@@ -127,14 +124,11 @@ class Queue:
         if self._queue_value == len(self._queue_list):
             self._queue_value -= len(self._queue_list)
 
-
-
     def get_last_person_in_queue(self) -> Person:
         """
 
         :return: Предыдущий в очереди
         """
-        # TODO: Rewrite for the queue with re-turn (Add new boolean variable)
         if self._queue_value == 0:
             return Person("0", "None")
         else:
@@ -170,20 +164,46 @@ class Queue:
         :param person_id: номер в списке
         :return: номер в очереди. 0 - если не найден в очереди
         """
+        pos = 0
+        passed_people = 0
         for i in range(len(self._queue_list)):
             if self._queue_list[i].get_id() == person_id:
-                return i + 1
-        return 0
+                pos = i + 1
+                break
+            elif self._queue_list[i].get_passed():
+                passed_people += 1
+        return pos - passed_people
 
-    def delete_person(self, person_id: str):
+    def delete_person(self, person_id: str, filename="queue.txt"):
         """
         Удаление персонажа с очереди
         :param person_id: номер ИСУ
         :return: None
         """
-        person_position = self.get_person_queue_position(person_id) - 1
-        del self._queue_list[person_position]
-        self.history.write(f"{self._queue_list[person_position].get_name()} удален из очереди в {Date.get_time()}")
+        f = open(filename, "r", encoding="UTF-8")
+        data = f.read().split("\n")
+        new_list = []
+        for p in data:
+            if p == "":
+                continue
+            p = p.split()
+            _NAME = p[1] + " " + p[2]
+            _ID = p[0]
+            if p[3] == "True":
+                _PASSED = True
+            else:
+                _PASSED = False
+
+            if _ID == person_id:
+                self.history.write(_NAME + " был удален из очереди в " + str(Date.get_time()))
+            else:
+                new_list.append(Person(_ID, _NAME, _PASSED))
+
+        self._queue_list = new_list
+
+        f.close()
+
+        self.write_queue_on_file()
 
     def add_person(self, person_id: str, position: int=-1):
 
@@ -191,7 +211,8 @@ class Queue:
 
         if position == -1:
             for person in self._GROUP_LIST:
-                if person.get_id() == person_id:
+                if str(person.get_id()) == person_id:
+                    print("YYYAYAAAY")
                     self._queue_list.append(person)
 
                     self.history.write(f"В конец очереди добавлен {person.get_name()} в {Date.get_time()}")
@@ -217,6 +238,8 @@ class Queue:
                 new_queue_list.append(self._queue_list[i])
 
             self._queue_list = new_queue_list
+        print(self._queue_list)
+        self.write_queue_on_file()
 
     def swap(self, person1_id: str, person2_id: str):
         """
@@ -242,6 +265,20 @@ class Queue:
                                            f" в {Date.get_time()}")
 
                         return
+
+    @staticmethod
+    def check_exist_in_queue(person_id, filename="history"):
+        f = open(filename, "r", encoding="UTF-8")
+        data = f.read().split("\n")
+        for p in data:
+            if p == "":
+                continue
+            p = p.split()
+            _ID = p[0]
+
+            if _ID == person_id:
+                return False
+        return True
 
     def test(self):
         self.new_queue()

@@ -10,5 +10,6 @@ class ModeEnum(Enum):
     REQUEST = ["режим заявки", "заявка", "request"]
     GET_NUMBER = ["GET NUMBER"]     # програмный мод
     YES_NO_ASK = ["YES NO ASK"]     # програмный мод
+    GET_STRING = ["GET STRING"]
     UNKNOWN = ["Unknown"]           # програмный мод
 

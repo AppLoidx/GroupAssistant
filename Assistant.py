@@ -18,16 +18,19 @@ class Assistant:
         self.vkid = vkid
         self.isu_id = isu_id
         self.persons = get_group_persons()
-        self.from_group_possible_commands = [CommandEnum.get_history,
+        self.from_group_possible_commands = [
                                              CommandEnum.person_passed,
                                              CommandEnum.get_queue,
                                              CommandEnum.now_mode,
                                              CommandEnum.new_queue,
-                                             CommandEnum.schedule]
+                                             CommandEnum.get_current_person_in_queue,
+                                             CommandEnum.get_next_person_in_queue,
+                                             CommandEnum.get_last_person_in_queue,
+                                             CommandEnum.get_person_queue_position]
 
         self.now_mode = ModeEnum.DEFAULT
         self.last_mode = ModeEnum.DEFAULT
-        self.queue = Queue()
+        self.queue = Queue(self.group_file_name)
         self.last_question = None
         self.last_command = None
         self.last_ask_yes_no_ans = None  # После завершения всегда присваивать None
@@ -36,6 +39,10 @@ class Assistant:
         self.not_readable_commands = []
         self.schedule = ScheduleFromFile()
         self.java_question = GetQuestionJava()
+        self.last_get_string_ans = None
+
+    def get_mode(self):
+        return self.now_mode
 
     def default_def(self):
         pass
@@ -70,17 +77,21 @@ class Assistant:
         if command is None:
             print("Command is None")
 
-        # Обработка нечитаемых событий
+# Обработка нечитаемых событий
+
         if command in self.not_readable_commands:
             return
 
-        # Обработка особых событий
+# Обработка особых событий
+
         if len(command) > 2:
             if command[0:2:] == "$$":
                 if command[2:6] == "swap":
 
+                    # TODO: Сделать отправку без ожидания от ввода пользователя
+                    # TODO: Отправить подтверждение смены места в очереди
                     if self.last_ask_yes_no_ans is None:
-                        # TODO mod change()
+
                         self.change_mode(ModeEnum.YES_NO_ASK)
                         self.last_command = command
                         return "Вы хотите поменяться местами с номером ИСУ " + command.split()[1] + "? (" \
@@ -93,7 +104,7 @@ class Assistant:
                                 self.queue.write_queue_on_file()
                                 self.change_mode(ModeEnum.DEFAULT)
                                 self.last_ask_yes_no_ans = None
-                                return "Заявка принята!"
+                                return "Вы успешно поменялись с очередью!"
                             else:
                                 return "Очереди нет"
                         else:
@@ -102,13 +113,18 @@ class Assistant:
         command = self.set_command(command, self.now_mode)
 
         self.future_def()
-        # Command identify
+# Command identify
+
+    # Mode change
 
         change_mode = self.identify_mode_change(command['text'])
         if change_mode[0]:
-            self.change_mode(change_mode[1])
-            print(self.now_mode, "=now mode")
-            return "Режим успешно изменён!\n Текущий режим: " + self.now_mode.value[0]
+            if from_id is None:
+                return "В группе доступен только режим очереди!"
+            else:
+                self.change_mode(change_mode[1])
+                print(self.now_mode, "=now mode")
+                return "Режим успешно изменён!\n Текущий режим: " + self.now_mode.value[0]
 
         if from_id is None:
             not_possible_command = True
@@ -128,12 +144,14 @@ class Assistant:
 
         command_type = command['command_enum']
 
-        # Вывод текущего мода
+# Вывод текущего мода
         if command_type == CommandEnum.now_mode:
             return self.now_mode.value[0]
 
         if self.now_mode == ModeEnum.YES_NO_ASK:
+
             if command['text'].upper() in ["Y", "YES", "ДА"]:
+                print("yeees")
                 self.now_mode = self.last_mode
                 self.last_ask_yes_no_ans = True
 
@@ -141,9 +159,25 @@ class Assistant:
                 self.now_mode = self.last_mode
                 self.last_ask_yes_no_ans = False
 
-            return self.command(self.last_command)
+            elif command['text'].upper() in ["ВЫХОД", "EXIT"]:
+                return "Вы отменили команду"
+
+            else:
+                return "Введите корректную команду!"
+
+            return self.command(self.last_command, from_id)
+
+        if self.now_mode == ModeEnum.GET_STRING:
+            if command['text'].upper() in ["ВЫХОД", "EXIT"]:
+                return "Вы отменили команду"
+            self.now_mode = self.last_mode
+            self.last_get_string_ans = command['text']
+            return self.command(self.last_command, from_id)
 
         if self.now_mode == ModeEnum.GET_NUMBER:
+            if command['text'].upper() in ["ВЫХОД", "EXIT"]:
+                return "Вы отменили команду"
+
             try:
                 self.last_get_number_ans = int(command['text'])
 
@@ -157,7 +191,7 @@ class Assistant:
         #              MAIN COMMANDS
         #
 
-        # QUESTION MODE
+# QUESTION MODE
         if self.now_mode == ModeEnum.QUESTION:
             if command['text'] in CommandEnum.get_java_question.value:
                 return self.java_question.get_question()[1]
@@ -165,7 +199,7 @@ class Assistant:
                 return self.java_question.last_answer
             else:
                 return "Не могу распознать вашу команду, простите."
-        # DEFAULT MODE
+# DEFAULT MODE
         if self.now_mode == ModeEnum.DEFAULT:
 
             # schedule
@@ -199,7 +233,7 @@ class Assistant:
                         return "Не нашла такого журнала в своей базе данных..."
                     return data['journals'][associate]
 
-        # REQUEST MODE
+# REQUEST MODE
         if self.now_mode == ModeEnum.REQUEST:
             if command['text'] in RequestEnum.SWAP.value:
                 if self.last_get_number_ans is None:
@@ -207,20 +241,42 @@ class Assistant:
                     self.last_command = command['text']
                     return "Введите номер ИСУ с которым хотите поменяться:"
                 else:
+                    if self.last_get_number_ans > 27 or self.last_get_number_ans < 1:
+                        return "Такого номера не существует!"
+                    else:
+                        JSONFile.add_request("swap", f"{self.isu_id} {self.last_get_number_ans}")
+                        self.last_get_number_ans = None
+                        self.now_mode = self.last_mode
+                        return "Заявка отправлена и будет передано пользователю"
+            if command_type == CommandEnum.send_spam:
+                print("access for = ", self.vkid)
+                if str(from_id) in JSONFile.read_json(self.group_file_name)["extended access"] or str(self.vkid) in JSONFile.read_json(self.group_file_name)["extended access"]:
+                    if self.last_get_string_ans is None:
 
-                    JSONFile.add_request("swap", f"{self.isu_id} {self.last_get_number_ans}")
-                    self.last_get_number_ans = None
-                    self.now_mode = self.last_mode
-                    return "Успешно!"
+                        self.change_mode(ModeEnum.GET_STRING)
+                        self.last_command = command['text']
+                        return "Напишите сообщение, которое вы хотите передать всем:"
+                    else:
+                        JSONFile.add_request("send2all", self.last_get_string_ans)
+                        self.last_get_string_ans = None
+                        return "Успешно!"
+                else:
+                    return "У вас нет прав для этого метода. Обратитесь к старосте или к моему создателю."
 
         print(command_type)
 
-        # QUEUE MODE
+# QUEUE MODE
         if self.now_mode == ModeEnum.QUEUE:
 
             if command_type == CommandEnum.new_queue:
                 if self.queue.exist_check():
-                    return "Очередь уже существует. Если вы хотите удалить его, то сделайте заявку."
+                    if str(from_id) in JSONFile.read_json(self.group_file_name)["extended access"] or str(self.vkid) in JSONFile.read_json(self.group_file_name)["extended access"]:
+                        self.queue.new_queue()
+                        self.queue.write_queue_on_file()
+                        return "Новая очередь создана. История очищена"
+                    else:
+                        return "Очередь уже существует. " \
+                           "Обратитесь к старосте или к моему создателю, чтобы создать новую очередь."
                 else:
                     self.queue.new_queue()
                     self.queue.write_queue_on_file()
@@ -253,6 +309,12 @@ class Assistant:
                 else:
                     return "Очереди нет"
 
+            elif command_type == CommandEnum.get_person_queue_position:
+                if self.queue.exist_check():
+                    self.queue.update_queue()
+                    return self.queue.get_person_queue_position(self.isu_id)
+                else:
+                    return "Очереди нет"
             elif command_type == CommandEnum.get_last_person_in_queue:
                 if self.queue.exist_check():
                     self.queue.update_queue()
@@ -293,9 +355,40 @@ class Assistant:
                 else:
                     return "Очереди нет"
 
+            elif command_type == CommandEnum.delete_person:
+                if self.queue.exist_check():
+                    self.queue.update_queue()
+
+                    if self.last_ask_yes_no_ans is None:
+                        self.change_mode(ModeEnum.YES_NO_ASK)
+                        self.last_command = command['text']
+                        return "Вы уверены? Вас удалят из очереди[y/n]"
+                    elif self.last_ask_yes_no_ans:
+                        self.last_ask_yes_no_ans = None
+                        self.change_mode(ModeEnum.QUEUE)
+                        self.queue.delete_person(self.isu_id)
+                        return f"Вы были удалены из очереди."
+                    else:
+                        return "Команда отменена"
+
+                else:
+                    return "Очереди нет"
+
+            elif command_type == CommandEnum.add_person:
+                if self.queue.exist_check():
+                    if self.queue.check_exist_in_queue(self.isu_id):
+                        return "Вы уже в очереди"
+                    else:
+                        self.queue.update_queue()
+
+                        self.queue.add_person(self.isu_id)
+                        return f"Вы добавлены в конец очереди"
+
+                else:
+                    return "Очереди нет"
+
         return "Не распознанная команда!"
 
-    # TODO: Rewrite to class
     @staticmethod
     def set_command(command, now_mode):
 

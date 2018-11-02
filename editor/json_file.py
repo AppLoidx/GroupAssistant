@@ -84,4 +84,15 @@ class JSONFile:
             if data["Persons"][index]['vkid'] == str(vkid):
                 return index
 
+    @staticmethod
+    def get_name_by_vkid(vkid, group_file_name):
+        data = JSONFile.read_json(group_file_name)
+        for index in data['Persons']:
+            if data["Persons"][index]['vkid'] == str(vkid):
+                return data["Persons"][index]['name']
+
+    @staticmethod
+    def read_keyboard(filename, directory="keyboards/"):
+        return open(directory+filename, "r", encoding="UTF-8").read()
+
 

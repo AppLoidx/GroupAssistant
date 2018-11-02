@@ -1,0 +1,28 @@
+{
+  "one_time": false,
+  "buttons": [
+    [{
+      "action": {
+        "type": "text",
+        "label": "java"
+      },
+      "color": "negative"
+    },
+      {
+        "action": {
+          "type": "text",
+          "label": "/default"
+        },
+        "color": "positive"
+      }],
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "answer"
+        },
+        "color": "default"
+      }
+    ]
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "one_time": false,
+  "buttons": [
+    [{
+      "action": {
+        "type": "text",
+        "label": "swap"
+      },
+      "color": "positive"
+    }],
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "сообщение для группы"
+        },
+        "color": "positive"
+      }]
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "one_time": false,
+  "buttons": [
+    [{
+      "action": {
+        "type": "text",
+        "label": "queue"
+      },
+      "color": "negative"
+    },
+      {
+        "action": {
+          "type": "text",
+          "label": "new queue"
+        },
+        "color": "positive"
+      }],
+    [{
+      "action": {
+        "type": "text",
+        "label": "passed"
+      },
+      "color": "default"
+    },
+      {
+        "action": {
+          "type": "text",
+          "label": "history"
+        },
+        "color": "primary"
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "current"
+        },
+        "color": "primary"
+      }],
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "last"
+        },
+        "color": "negative"
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "next"
+        },
+        "color": "positive"
+      }
+    ]
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "one_time": false,
+  "buttons": [
+    [{
+      "action": {
+        "type": "text",
+        "label": "/queue"
+      },
+      "color": "negative"
+    }],
+
+    [{
+      "action": {
+        "type": "text",
+        "label": "last"
+      },
+      "color": "default"
+    },
+      {
+        "action": {
+          "type": "text",
+          "label": "current"
+        },
+        "color": "primary"
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "next"
+        },
+        "color": "primary"
+      }],
+
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "passed"
+        },
+        "color": "primary"
+      }
+    ]
+  ]
+}
