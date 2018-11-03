@@ -56,7 +56,7 @@ class VkServer:
                     self.ids[str(event.object.from_id)] = Assistant(event.object.from_id,
                                                                     JSONFile.get_id_by_vkid(str(event.object.from_id),
                                                                                             self.group_file_name),
-                                                                    self.group_file_name)
+                                                                    self.group_file_name, True)
 
 
                 if event.group_id:

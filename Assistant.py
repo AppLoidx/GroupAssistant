@@ -13,7 +13,7 @@ from questions.get_question import GetQuestionJava
 
 class Assistant:
 
-    def __init__(self, vkid, isu_id, group_file_name):
+    def __init__(self, vkid, isu_id, group_file_name, not_registered=False):
 
         self.group_file_name = group_file_name
         self.vkid = vkid
@@ -28,7 +28,14 @@ class Assistant:
                                              CommandEnum.get_next_person_in_queue,
                                              CommandEnum.get_last_person_in_queue,
                                              CommandEnum.get_person_queue_position]
-
+        self.not_registered_commands =[
+            CommandEnum.now_mode,
+            CommandEnum.schedule,
+            CommandEnum.get_java_answer,
+            CommandEnum.get_java_question,
+            CommandEnum.get_journal_link,
+        ]
+        self.not_registered = not_registered
         self.now_mode = ModeEnum.DEFAULT
         self.last_mode = ModeEnum.DEFAULT
         self.queue = Queue(self.group_file_name)
@@ -126,6 +133,17 @@ class Assistant:
                 self.change_mode(change_mode[1])
                 return "Режим успешно изменён!\n Текущий режим: " + self.now_mode.value[0]
 
+        # Register check
+
+        if self.not_registered:
+            for cmd in self.not_registered_commands:
+                if command['text'] in cmd.value or command['text'].split()[0] in cmd.value:
+                    pass
+                else:
+                    return "Вы не зарегестрированный пользователь, " \
+                           "поэтому вам не доступны команда для редактирования очереди " \
+                           "или другого взаимодействия с группой."
+
         if from_id is None:
             not_possible_command = True
             for cmd in self.from_group_possible_commands:
@@ -135,7 +153,9 @@ class Assistant:
                     not_possible_command = False
             if not_possible_command:
                 return "Недопустимая команда для группы!"
+
         else:
+
             command['from_id'] = from_id
             for cmd in CommandEnum:
                 if command['text'] in cmd.value:
