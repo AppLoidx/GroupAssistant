@@ -34,17 +34,25 @@ class GetQuestionJava:
         return q_a_a
 
     def get_question(self, quest_id: int = -1) -> list:
+        try:
+            quest_id = int(quest_id)
+        except ValueError:
+            quest_id = -1
+
         if quest_id == -1:
             quest_id = random.randint(0, 61)
         else:
-            quest_id += 1
+            quest_id -= 1
 
         if quest_id not in self.wasted_questions:
             self.wasted_questions.append(quest_id)
 
         self.last_question = quest_id - 1
-        self.last_answer = self.q_a_a[quest_id][1]
-
+        try:
+            self.last_answer = self.q_a_a[quest_id][1]
+        except IndexError:
+            quest_id = 61
+            self.last_answer = self.q_a_a[quest_id][1]
         return [quest_id,                   # question id
                 self.q_a_a[quest_id][0],    # question
                 self.q_a_a[quest_id][1]]    # answer

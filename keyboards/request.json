@@ -15,6 +15,14 @@
           "label": "сообщение для группы"
         },
         "color": "positive"
+      }],
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "/default"
+        },
+        "color": "default"
       }]
   ]
 }

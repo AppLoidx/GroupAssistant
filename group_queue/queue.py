@@ -280,6 +280,24 @@ class Queue:
                 return True
         return False
 
+    @staticmethod
+    def check_person_passed(person_id, filename="queue.txt"):
+        f = open(filename, "r", encoding="UTF-8")
+        data = f.read().split("\n")
+        for p in data:
+            if p == "":
+                continue
+            p = p.split()
+            _ID = p[0]
+
+            if _ID == str(person_id):
+                if p[3] == "True":
+                    return True
+                else:
+                    return False
+
+        return None
+
     def test(self):
         self.new_queue()
         return self.get_queue()

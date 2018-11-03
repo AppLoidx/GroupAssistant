@@ -1,6 +1,5 @@
 import vk_api.vk_api
 from Assistant import Assistant
-from editor.editor import Edit
 
 from vk_api.bot_longpoll import VkBotLongPoll
 from vk_api.bot_longpoll import VkBotEventType
@@ -33,7 +32,7 @@ class VkServer:
 
         self.messenger = Messenger(self.vk_s, self.ids)
 
-        self.spam = Spam(self.vk_s,self.ids,self.group_file_name)
+        self.spam = Spam(self.vk_s, self.ids, self.group_file_name)
 
         print("Server " + self.server_name + " working...")
 
@@ -41,7 +40,7 @@ class VkServer:
         data = JSONFile.read_json(filename)
         res = {}
         for info in data['Persons']:
-            res[data["Persons"][info]['vkid']] = Assistant(data["Persons"][info]['vkid'], info, self.group_file_name)
+            res[data["Persons"][info]['vkid']] = Assistant(self.vk_s, data["Persons"][info]['vkid'], info, self.group_file_name)
 
         return res
 
@@ -53,11 +52,10 @@ class VkServer:
             if event.type == VkBotEventType.MESSAGE_NEW:
 
                 if str(event.object.from_id) not in self.ids:
-                    self.ids[str(event.object.from_id)] = Assistant(event.object.from_id,
+                    self.ids[str(event.object.from_id)] = Assistant(self.vk_s, event.object.from_id,
                                                                     JSONFile.get_id_by_vkid(str(event.object.from_id),
                                                                                             self.group_file_name),
                                                                     self.group_file_name, True)
-
 
                 if event.group_id:
                     pass
