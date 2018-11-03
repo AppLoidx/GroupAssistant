@@ -124,7 +124,6 @@ class Assistant:
                 return "В группе доступен только режим очереди!"
             else:
                 self.change_mode(change_mode[1])
-                print(self.now_mode, "=now mode")
                 return "Режим успешно изменён!\n Текущий режим: " + self.now_mode.value[0]
 
         if from_id is None:
@@ -276,6 +275,7 @@ class Assistant:
                 if self.queue.exist_check():
                     if str(from_id) in JSONFile.read_json(self.group_file_name)["extended access"] or str(self.vkid) in JSONFile.read_json(self.group_file_name)["extended access"]:
                         self.queue.new_queue()
+                        self.queue.history.clean()
                         self.queue.write_queue_on_file()
                         return "Новая очередь создана. История очищена"
                     else:
@@ -289,7 +289,7 @@ class Assistant:
 
             # Функции не изменяющие очередь
             elif command_type == CommandEnum.get_history:
-                print("history")
+
                 result = ""
                 for i in self.queue.history.get_history():
                     result += i + "\n"

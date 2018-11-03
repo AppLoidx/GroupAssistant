@@ -58,11 +58,9 @@ class VkServer:
                                                                                             self.group_file_name),
                                                                     self.group_file_name)
 
-                print('Новое сообщение:')
 
                 if event.group_id:
                     pass
-                print('Текст: ', event.object.text, end="\n")
 
                 """
                 vk_s.messages.send(peer_id=event.object.peer_id,

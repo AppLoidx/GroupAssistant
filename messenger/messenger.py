@@ -16,8 +16,11 @@ class Messenger:
             msg = self.ids[str(event.object.from_id)].command(
                 Edit.clean_str_from_symbol(event.object.text, "[", "]").strip(" "), from_id)
 
+        if msg.strip("\n") == "" or msg is None:
+            msg = "(Пусто)"
+
         assistant_mode = self.ids[str(event.object.from_id)].get_mode()
-        print("Assistant_mode = ", assistant_mode)
+
         if keyboard is None:
             keyboard = None
             if assistant_mode == (ModeEnum.GET_STRING or ModeEnum.GET_NUMBER):
@@ -43,7 +46,6 @@ class Messenger:
                                       message=msg)
         else:
             if keyboard is not None:
-                print(keyboard)
                 self.vk.messages.send(peer_id=event.object.peer_id,
                                       message=msg,
                                       keyboard=JSONFile.read_keyboard(keyboard))
@@ -52,6 +54,8 @@ class Messenger:
                                       message=msg)
 
     def send_message(self, peer_id, msg):
+        if msg == "":
+            msg = "None"
         print("send to " + str(peer_id))
         try:
             self.vk.messages.send(user_id=int(peer_id), message=msg)
