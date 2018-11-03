@@ -212,7 +212,6 @@ class Queue:
         if position == -1:
             for person in self._GROUP_LIST:
                 if str(person.get_id()) == person_id:
-                    print("YYYAYAAAY")
                     self._queue_list.append(person)
 
                     self.history.write(f"В конец очереди добавлен {person.get_name()} в {Date.get_time()}")
@@ -238,7 +237,6 @@ class Queue:
                 new_queue_list.append(self._queue_list[i])
 
             self._queue_list = new_queue_list
-        print(self._queue_list)
         self.write_queue_on_file()
 
     def swap(self, person1_id: str, person2_id: str):
