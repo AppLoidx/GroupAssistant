@@ -267,7 +267,7 @@ class Queue:
                         return
 
     @staticmethod
-    def check_exist_in_queue(person_id, filename="history"):
+    def check_exist_in_queue(person_id, filename="queue.txt"):
         f = open(filename, "r", encoding="UTF-8")
         data = f.read().split("\n")
         for p in data:
@@ -277,8 +277,8 @@ class Queue:
             _ID = p[0]
 
             if _ID == person_id:
-                return False
-        return True
+                return True
+        return False
 
     def test(self):
         self.new_queue()

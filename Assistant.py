@@ -373,6 +373,7 @@ class Assistant:
                         self.queue.delete_person(self.isu_id)
                         return f"Вы были удалены из очереди."
                     else:
+                        self.last_ask_yes_no_ans = None
                         return "Команда отменена"
 
                 else:
@@ -380,6 +381,7 @@ class Assistant:
 
             elif command_type == CommandEnum.add_person:
                 if self.queue.exist_check():
+
                     if self.queue.check_exist_in_queue(self.isu_id):
                         return "Вы уже в очереди"
                     else:
