@@ -17,13 +17,14 @@ from spam import Spam
 
 class VkServer:
 
-    def __init__(self, server_name, group_file_name, group_id):
+    def __init__(self, server_name, group_file_name, group_id, api_token):
         self.server_name = server_name
         self.group_file_name = group_file_name
         self.parser = Parser()
 
         print(f"[{server_name}] connection to vk API...")
-        self.vk = vk_api.VkApi(token=group_vk_api_token)
+
+        self.vk = vk_api.VkApi(token=api_token)
         self.vk_s = self.vk.get_api()
 
         self.longpoll = VkBotLongPoll(self.vk, group_id)
@@ -120,12 +121,10 @@ class VkServer:
     def get_server_name(self):
         return self.server_name
 
-    def spam_test(self):
-        self.spam.send_spam("Извините за беспокойство. Это тестовая рассылка объявлений всей группе. Эта функция будет"
-                            " доступна лишь для старосты и не будет использоваться как спам. Если вы хотите отказаться "
-                            "от подобной рассылки напишите в личку https://vk.com/apploidxxx")
+    def spam_test(self, idd):
+        self.messenger.send_message(str(idd), "Вы авторизовались как " +
+                                    str(JSONFile.get_name_by_vkid(str(idd), self.group_file_name)) + ". Если это не вы, " \
+                                    "сообщите моему создателю https://vk.com/apploidxxx. Испольщзуйте функцию help для " \
+                                     "вывода справки по командам, также посетите документацию на " \
+                            "https://github.com/AppLoidx/GroupAssistant/wiki/Как-пользоваться-интегрированным-ботом%3F.")
 
-""" Notes
-
-requests.exceptions.ConnectionError
-"""

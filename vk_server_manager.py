@@ -1,5 +1,5 @@
 from threading import Thread
-
+from config import group_vk_api_token
 from vk_server import VkServer
 
 
@@ -20,13 +20,13 @@ def add_server(server: VkServer, dictionary):
 
 def run_all(dictionary):
     for server in dictionary:
-        #dictionary[server].start()
+
         dictionary[server].start()
-        print(f"Server {server.get_server_name()} started!")
+        print(f"Server {dictionary[server].get_server_name()} started!")
 
 
 servers = {}
+add_server(VkServer("P3112 server", "groups_list/P3112.json", 173296780, group_vk_api_token), servers)
 
-add_server(VkServer("P3112 server", "groups_list/P3112.json", 173296780), servers)
 
 run_all(servers)
