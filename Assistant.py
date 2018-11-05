@@ -6,7 +6,7 @@ from enums.requests_enum import RequestEnum
 from group_persons import *
 from group_queue.queue import Queue
 from manual.manual import Manual
-from messenger.messenger import Messenger
+from vk_api.vk_api import ApiError
 from schedule.schedule_from_file import ScheduleFromFile
 from editor.json_file import JSONFile
 from questions.get_question import GetQuestionJava
@@ -144,7 +144,7 @@ class Assistant:
                     pass
                 else:
                     return "Вы не зарегестрированный пользователь, " \
-                           "поэтому вам не доступны команда для редактирования очереди " \
+                           "поэтому вам не доступны команды для редактирования очереди " \
                            "или другого взаимодействия с группой."
 
         if from_id is None:
@@ -409,13 +409,35 @@ class Assistant:
                 if self.queue.exist_check():
                     self.queue.update_queue()
 
-                    if from_id is None:
+                    # TODO : rewite to func
+                    if self.vkid in JSONFile.read_json(self.group_file_name)['extended access'] or \
+                            self.vkid in JSONFile.read_json(self.group_file_name)['moderators']:
+
                         self.queue.person_passed()
                         self.queue.write_queue_on_file()
+
+                        # Предупреждение следующих по очереди
+                        NOW_USER_ID = self.queue.get_current_person_in_queue().get_id()
+                        message_for_now = f"Пользователь {self.queue.get_last_person_in_queue().get_name()} прошел\n" \
+                                          f" очередь. Сейчас на очереди вы."
+                        NEXT_USER_ID = self.queue.get_next_person_in_queue().get_id()
+                        message_for_next = f"Пользователь {self.queue.get_last_person_in_queue().get_name()} прошел\n" \
+                                           f" очередь. Пользователь {self.queue.get_current_person_in_queue().get_name()}" \
+                                           f" сейчас в очереди. После него идете вы, будьте готовы!"
+
+                        self.send_msg(JSONFile.get_vkid_by_id(NOW_USER_ID, self.group_file_name), message_for_now)
+                        self.send_msg(JSONFile.get_vkid_by_id(NEXT_USER_ID, self.group_file_name), message_for_next)
+
                         return f"{self.queue.get_last_person_in_queue().get_name()} прошел"
 
                     else:
-                        return "Напишите пожалуйста в группу!"
+                        accessed_people = ""
+                        for vkid in JSONFile.read_json(self.group_file_name)['extended access']:
+                            accessed_people += JSONFile.get_name_by_vkid(vkid, self.group_file_name) + "\n"
+                        for vkid in JSONFile.read_json(self.group_file_name)['moderators']:
+                            accessed_people += JSONFile.get_name_by_vkid(vkid, self.group_file_name) + "\n"
+                        return "У вас нет доступа для этой команды, обратитесь к тем у кого есть доступ:\n" \
+                               + accessed_people
                 else:
                     return "Очереди нет"
 
@@ -463,3 +485,10 @@ class Assistant:
                 "command_enum": CommandEnum.unknown,
                 "mode": now_mode,
                 "from_id": None}
+
+    def send_msg(self, peer_id, msg):
+        try:
+            self.vk_api.messages.send(peer_id=peer_id,
+                                      message=msg)
+        except ApiError:
+            print("Ошибка доступа для " + str(peer_id))

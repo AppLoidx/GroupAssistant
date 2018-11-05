@@ -58,6 +58,6 @@ class Messenger:
             msg = "None"
         print("send to " + str(peer_id))
         try:
-            self.vk.messages.send(user_id=int(peer_id), message=msg)
+            self.vk.messages.send(user_id=int(peer_id), message=msg, keyboard=open("keyboards/none.json", "r").read())
         except ApiError:
             print("Ошибка доступа!")

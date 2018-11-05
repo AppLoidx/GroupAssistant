@@ -22,6 +22,7 @@ def run_all(dictionary):
     for server in dictionary:
 
         dictionary[server].start()
+
         print(f"Server {dictionary[server].get_server_name()} started!")
 
 

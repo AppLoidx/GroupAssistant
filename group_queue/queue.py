@@ -114,15 +114,21 @@ class Queue:
         Вызывается когда кто-то прошел очередь. Инициализирует сдвиг очереди
         :return: None
         """
-        self._queue_list[self._queue_value].set_passed(True)
-        self.history.write(f"{self._queue_list[self._queue_value].get_id()}"
-                           f" {self._queue_list[self._queue_value].get_name()}"
-                           f" прошел очередь в {Date.get_time()}")
-        self._queue_value += 1
+        try:
+            self._queue_list[self._queue_value].set_passed(True)
+            self.history.write(f"{self._queue_list[self._queue_value].get_id()}"
+                               f" {self._queue_list[self._queue_value].get_name()}"
+                               f" прошел очередь в {Date.get_time()}")
+            self._queue_value += 1
 
-        # При переполнении
-        if self._queue_value == len(self._queue_list):
-            self._queue_value -= len(self._queue_list)
+            # При переполнении
+            if self._queue_value == len(self._queue_list):
+                self._queue_value -= len(self._queue_list)
+
+        except IndexError:
+            for person in self._queue_list:
+                person.set_passed(False)
+            self._queue_value = 0
 
     def get_last_person_in_queue(self) -> Person:
         """

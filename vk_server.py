@@ -27,7 +27,7 @@ class VkServer:
         self.vk = vk_api.VkApi(token=api_token)
         self.vk_s = self.vk.get_api()
 
-        self.longpoll = VkBotLongPoll(self.vk, group_id)
+        self.longpoll = VkBotLongPoll(self.vk, group_id, wait=25)
 
         self.ids = self._set_persons(group_file_name)
 
@@ -41,7 +41,8 @@ class VkServer:
         data = JSONFile.read_json(filename)
         res = {}
         for info in data['Persons']:
-            res[data["Persons"][info]['vkid']] = Assistant(self.vk_s, data["Persons"][info]['vkid'], info, self.group_file_name)
+            res[data["Persons"][info]['vkid']] = Assistant(self.vk_s, data["Persons"][info]['vkid'], info,
+                                                           self.group_file_name)
 
         return res
 
@@ -65,18 +66,18 @@ class VkServer:
                 vk_s.messages.send(peer_id=event.object.peer_id,
                 message=None)
                 """
-                if True:#event.object.from_id == admin_vk_id:
+                if True:  # event.object.from_id == admin_vk_id:
                     if event.object.id == 0:
-                        self.ids[str(event.object.from_id)].change_mode(ModeEnum.QUEUE)
-                        self.messenger.send_message_by_event(event, keyboard="group.json")
+                        self.messenger.send_message(event.object.from_id, "Сообщения в группе запрещены. "
+                                                                          "Пожалуйста, пишите в личные сообщения)))")
                     else:
 
                         self.messenger.send_message_by_event(event, from_id=event.object.from_id)
 
                 else:
                     self.messenger.send_message_by_event(event, str(JSONFile.get_name_by_vkid(event.object.from_id,
-                                                                                 self.group_file_name)) +
-                                                ", сейчас я нахожусь в тестовом режиме!")
+                                                                                              self.group_file_name)) +
+                                                         ", сейчас я нахожусь в тестовом режиме!")
 
     def do_requests_list(self, filename="request_list.json"):
         data = JSONFile.read_json(filename)
@@ -120,11 +121,3 @@ class VkServer:
 
     def get_server_name(self):
         return self.server_name
-
-    def spam_test(self, idd):
-        self.messenger.send_message(str(idd), "Вы авторизовались как " +
-                                    str(JSONFile.get_name_by_vkid(str(idd), self.group_file_name)) + ". Если это не вы, " \
-                                    "сообщите моему создателю https://vk.com/apploidxxx. Испольщзуйте функцию help для " \
-                                     "вывода справки по командам, также посетите документацию на " \
-                            "https://github.com/AppLoidx/GroupAssistant/wiki/Как-пользоваться-интегрированным-ботом%3F.")
-
