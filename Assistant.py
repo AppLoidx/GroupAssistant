@@ -411,7 +411,8 @@ class Assistant:
 
                     # TODO : rewite to func
                     if self.vkid in JSONFile.read_json(self.group_file_name)['extended access'] or \
-                            self.vkid in JSONFile.read_json(self.group_file_name)['moderators']:
+                            self.vkid in JSONFile.read_json(self.group_file_name)['moderators'] or \
+                            self.queue.get_current_person_in_queue() == self.isu_id:
 
                         self.queue.person_passed()
                         self.queue.write_queue_on_file()
