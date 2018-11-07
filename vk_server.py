@@ -4,11 +4,9 @@ from Assistant import Assistant
 from vk_api.bot_longpoll import VkBotLongPoll
 from vk_api.bot_longpoll import VkBotEventType
 
-from config import group_vk_api_token
 from config import admin_vk_id
 
 from editor.json_file import JSONFile
-from enums.mode_enum import ModeEnum
 from parser_m.parser import Parser
 
 from messenger.messenger import Messenger
@@ -66,7 +64,7 @@ class VkServer:
                 vk_s.messages.send(peer_id=event.object.peer_id,
                 message=None)
                 """
-                if event.object.from_id == admin_vk_id:
+                if True:  # event.object.from_id == admin_vk_id:
 
                     if event.object.id == 0:
                         self.messenger.send_message(event.object.from_id, "Сообщения в группе запрещены. "
@@ -74,10 +72,10 @@ class VkServer:
                     else:
                         self.messenger.send_message_by_event(event, from_id=event.object.from_id)
 
-                else:
-                    self.messenger.send_message_by_event(event, str(JSONFile.get_name_by_vkid(event.object.from_id,
-                                                                                              self.group_file_name)) +
-                                                         ", сейчас я нахожусь в тестовом режиме!")
+                # else:
+                #     self.messenger.send_message_by_event(event, str(JSONFile.get_name_by_vkid(event.object.from_id,
+                #                                                                               self.group_file_name)) +
+                #                                          ", сейчас я нахожусь в тестовом режиме!")
 
     def do_requests_list(self, filename="request_list.json"):
         data = JSONFile.read_json(filename)
