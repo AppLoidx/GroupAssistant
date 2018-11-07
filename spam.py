@@ -17,8 +17,10 @@ class Spam:
                 pass
             elif vkid is None:
                 pass
+            elif not JSONFile.read_json(self.group_file_name)["Persons"][self.ids[vkid].isu_id]['settings']['4all_msg']:
+                pass
             else:
                 self.messenger.send_message(vkid, msg)
 
-    def test_send(self,msg):
-        self.messenger.send_message(255396611, msg)
+    def test_send(self, msg):
+        pass

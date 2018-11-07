@@ -223,7 +223,9 @@ class Assistant:
         #              MAIN COMMANDS
         #
 
+        #
         # QUESTION MODE
+        #
         if self.now_mode == ModeEnum.QUESTION:
             if command['text'].split()[0] in CommandEnum.get_java_question.value:
                 if len(command['text'].split()) > 1:
@@ -234,7 +236,9 @@ class Assistant:
                 return self.java_question.last_answer
             else:
                 return "Не могу распознать вашу команду, простите."
+        #
         # DEFAULT MODE
+        #
         if self.now_mode == ModeEnum.DEFAULT:
 
             # schedule
@@ -267,8 +271,9 @@ class Assistant:
                     if associate is None:
                         return "Не нашла такого журнала в своей базе данных..."
                     return data['journals'][associate]
-
+        #
         # REQUEST MODE
+        #
         if self.now_mode == ModeEnum.REQUEST:
             if command['text'] in RequestEnum.SWAP.value:
                 if not self.queue.check_person_passed(self.isu_id):
@@ -286,6 +291,10 @@ class Assistant:
                             self.now_mode = self.last_mode
                             self.last_get_number_ans = None
                             return "Запрашиваемый пользователь уже прошел очередь. Заявка отменена!"
+                        elif not JSONFile.read_json(self.group_file_name)["Persons"][self.last_get_number_ans]['settings']['swap_request']:
+                            self.now_mode = self.last_mode
+                            self.last_get_number_ans = None
+                            return "Запрашиваемый пользователь запретил подачи заявки на обмен мест. Заявка отменена!"
                         else:
                             JSONFile.add_request("swap", f"{self.isu_id} {self.last_get_number_ans}")
 
@@ -326,8 +335,9 @@ class Assistant:
                     return "У вас нет прав для этого метода. Обратитесь к старосте или к моему создателю."
 
         print(command_type)
-
+        #
         # QUEUE MODE
+        #
         if self.now_mode == ModeEnum.QUEUE:
 
             if command_type == CommandEnum.new_queue:
@@ -412,22 +422,25 @@ class Assistant:
                     # TODO : rewite to func
                     if self.vkid in JSONFile.read_json(self.group_file_name)['extended access'] or \
                             self.vkid in JSONFile.read_json(self.group_file_name)['moderators'] or \
-                            self.queue.get_current_person_in_queue() == self.isu_id:
+                            self.queue.get_current_person_in_queue().get_id() == self.isu_id:
 
                         self.queue.person_passed()
                         self.queue.write_queue_on_file()
 
                         # Предупреждение следующих по очереди
-                        NOW_USER_ID = self.queue.get_current_person_in_queue().get_id()
+                        now_user_id = self.queue.get_current_person_in_queue().get_id()
                         message_for_now = f"Пользователь {self.queue.get_last_person_in_queue().get_name()} прошел\n" \
                                           f" очередь. Сейчас на очереди вы."
-                        NEXT_USER_ID = self.queue.get_next_person_in_queue().get_id()
+                        next_user_id = self.queue.get_next_person_in_queue().get_id()
                         message_for_next = f"Пользователь {self.queue.get_last_person_in_queue().get_name()} прошел\n" \
-                                           f" очередь. Пользователь {self.queue.get_current_person_in_queue().get_name()}" \
+                                           f" очередь. Пользователь " \
+                                           f"{self.queue.get_current_person_in_queue().get_name()}" \
                                            f" сейчас в очереди. После него идете вы, будьте готовы!"
 
-                        self.send_msg(JSONFile.get_vkid_by_id(NOW_USER_ID, self.group_file_name), message_for_now)
-                        self.send_msg(JSONFile.get_vkid_by_id(NEXT_USER_ID, self.group_file_name), message_for_next)
+                        if JSONFile.read_json(self.group_file_name)["Persons"][now_user_id]['settings']['push']:
+                            self.send_msg(JSONFile.get_vkid_by_id(now_user_id, self.group_file_name), message_for_now)
+                        if JSONFile.read_json(self.group_file_name)["Persons"][next_user_id]['settings']['push']:
+                            self.send_msg(JSONFile.get_vkid_by_id(next_user_id, self.group_file_name), message_for_next)
 
                         return f"{self.queue.get_last_person_in_queue().get_name()} прошел"
 
@@ -475,8 +488,63 @@ class Assistant:
 
                 else:
                     return "Очереди нет"
+        #
+        # SETTINGS
+        #
+        if self.now_mode == ModeEnum.SETTINGS:
+            if command_type == CommandEnum.show:
+                res = ""
+                settings = JSONFile.read_json(self.group_file_name)["Persons"][self.isu_id]["settings"]
+                for setting in settings:
+                    set_name = "None"
+                    if settings[setting] is True:
+                        value = "Да"
+                    else:
+                        value = "Нет"
 
-        return "Не распознанная команда!"
+                    if setting == "4all_msg":
+                        set_name = "1.Уведомления от старосты:"
+                    elif setting == "push":
+                        set_name = "2.Уведомления о событиях:"
+                    elif setting == "swap_request":
+                        set_name = "3.Возможность смены очереди:"
+
+                    res += set_name+" " + value + "\n"
+
+                return res
+
+            if command_type == CommandEnum.send_spam or command_type == CommandEnum.one:
+                if self.last_ask_yes_no_ans is None:
+                    self.change_mode(ModeEnum.YES_NO_ASK)
+                    self.last_command = command['text']
+                    return "Вы хотите чтобы вас уведомляли личным сообщением о важных объявлениях?"
+                else:
+                    JSONFile.set_setting("4all_msg", self.last_ask_yes_no_ans, self.isu_id, self.group_file_name)
+                    self.last_ask_yes_no_ans = None
+                    return "Ваш ответ принят!"
+
+            if command_type == CommandEnum.change_push or command_type == CommandEnum.two:
+                if self.last_ask_yes_no_ans is None:
+                    self.change_mode(ModeEnum.YES_NO_ASK)
+                    self.last_command = command['text']
+                    return "Вы хотите чтобы вас уведомляли личным сообщением об изменениях очереди," \
+                           " и приближении вашего?"
+                else:
+                    JSONFile.set_setting("push", self.last_ask_yes_no_ans, self.isu_id, self.group_file_name)
+                    self.last_ask_yes_no_ans = None
+                    return "Ваш ответ принят!"
+
+            if command_type == CommandEnum.swap or command_type == CommandEnum.three:
+                if self.last_ask_yes_no_ans is None:
+                    self.change_mode(ModeEnum.YES_NO_ASK)
+                    self.last_command = command['text']
+                    return "Вы хотите чтобы другие люди кидали вам заявку на обмен мест в очереди?"
+                else:
+                    JSONFile.set_setting("swap_request", self.last_ask_yes_no_ans, self.isu_id, self.group_file_name)
+                    self.last_ask_yes_no_ans = None
+                    return "Ваш ответ принят!"
+
+        return "Не распознанная команда! Текущий мод: " + self.now_mode.value[0]
 
     @staticmethod
     def set_command(command, now_mode):

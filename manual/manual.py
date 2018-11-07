@@ -17,6 +17,10 @@ class Manual:
             data = JSONFile.read_json(work_dir+"request.json")
         elif mode == ModeEnum.QUESTION:
             data = JSONFile.read_json(work_dir+"question.json")
+        elif mode == ModeEnum.SETTINGS:
+            data = JSONFile.read_json(work_dir+"settings.json")
+        else:
+            return "Мануал по данному моду пока не создан, либо редактируется."
 
         res = ""
 

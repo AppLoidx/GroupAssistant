@@ -66,12 +66,12 @@ class VkServer:
                 vk_s.messages.send(peer_id=event.object.peer_id,
                 message=None)
                 """
-                if True:  # event.object.from_id == admin_vk_id:
+                if event.object.from_id == admin_vk_id:
+
                     if event.object.id == 0:
                         self.messenger.send_message(event.object.from_id, "Сообщения в группе запрещены. "
                                                                           "Пожалуйста, пишите в личные сообщения)))")
                     else:
-
                         self.messenger.send_message_by_event(event, from_id=event.object.from_id)
 
                 else:

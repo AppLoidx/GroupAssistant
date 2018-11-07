@@ -8,6 +8,8 @@ class ModeEnum(Enum):
     QUEUE = ["режим очереди", "очередь", "queue"]
     DEFAULT = ["обычный режим", "default", "обычный", "выйти", "закончить"]
     REQUEST = ["режим заявки", "заявка", "request"]
+    SETTINGS = ["режим настроек", "settings", "set"]
+
     GET_NUMBER = ["GET NUMBER"]     # програмный мод
     YES_NO_ASK = ["YES NO ASK"]     # програмный мод
     GET_STRING = ["GET STRING"]

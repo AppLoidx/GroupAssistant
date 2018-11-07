@@ -3,9 +3,17 @@ from enum import Enum
 
 class CommandEnum(Enum):
 
+    # Common
+    one = [1, "1"]
+    two = [2, "2"]
+    three = [3, "3"]
+    four = [4, "4"]
+    five = [5, "5"]
+    six = [6, "6"]
+
     # Вывод текущего режима
     now_mode = ["текущий режим", "режим", "mode", "now mode"]
-    
+
     # help
     help = ["help", "хелп", "man"]
 
@@ -35,10 +43,13 @@ class CommandEnum(Enum):
     # Requests
     swap_request = ["swap", "смена места в очереди", "смена"]
 
-
     # Вопросы (про Java и тд)
     get_java_question = ["java", "джава"]
     get_java_answer = ["ответ", "answer"]
+
+    # Settings
+    show = ["show", "settings"]
+    change_push = ["push"]
 
     # Неизвестная команда
     unknown = ["unknown"]

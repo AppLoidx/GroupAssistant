@@ -35,7 +35,8 @@ class Messenger:
                 keyboard = "question.json"
             elif assistant_mode == ModeEnum.REQUEST:
                 keyboard = "request.json"
-
+            elif assistant_mode == ModeEnum.SETTINGS:
+                keyboard = "settings.json"
         if from_id is None:
             if keyboard is not None:
                 self.vk.messages.send(peer_id=event.object.peer_id,

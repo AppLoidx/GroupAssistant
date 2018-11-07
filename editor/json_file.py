@@ -95,4 +95,10 @@ class JSONFile:
     def read_keyboard(filename, directory="keyboards/"):
         return open(directory+filename, "r", encoding="UTF-8").read()
 
-
+    @staticmethod
+    def set_setting(setting_name, value, user_id, group_file_name):
+        data = JSONFile.read_json(group_file_name)
+        for index in data['Persons']:
+            if index == str(user_id):
+                data['Persons'][index]['settings'][setting_name] = value
+        JSONFile.set_json_data(data, group_file_name)

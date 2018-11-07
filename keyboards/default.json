@@ -21,6 +21,13 @@
           "label": "/request"
         },
         "color": "positive"
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "/settings"
+        },
+        "color": "positive"
       }],
 
 
