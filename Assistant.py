@@ -291,7 +291,7 @@ class Assistant:
                             self.now_mode = self.last_mode
                             self.last_get_number_ans = None
                             return "Запрашиваемый пользователь уже прошел очередь. Заявка отменена!"
-                        elif not JSONFile.read_json(self.group_file_name)["Persons"][self.last_get_number_ans]['settings']['swap_request']:
+                        elif not JSONFile.read_json(self.group_file_name)["Persons"][str(self.last_get_number_ans)]['settings']['swap_request']:
                             self.now_mode = self.last_mode
                             self.last_get_number_ans = None
                             return "Запрашиваемый пользователь запретил подачи заявки на обмен мест. Заявка отменена!"
