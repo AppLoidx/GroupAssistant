@@ -1,3 +1,4 @@
+import sys
 from threading import Thread
 from config import group_vk_api_token
 from vk_server import VkServer
@@ -20,8 +21,12 @@ def add_server(server: VkServer, dictionary):
 
 def run_all(dictionary):
     for server in dictionary:
-
-        dictionary[server].start()
+        if len(sys.argv) > 1:
+            if sys.argv[1] == "test":
+                print(f"{dictionary[server].get_server_name()} -- test mode")
+                dictionary[server].start()
+        else:
+            dictionary[server].mainloop()
 
         print(f"Server {dictionary[server].get_server_name()} started!")
 
