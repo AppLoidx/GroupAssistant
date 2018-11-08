@@ -25,6 +25,8 @@ def run_all(dictionary):
             if sys.argv[1] == "test":
                 print(f"{dictionary[server].get_server_name()} -- test mode")
                 dictionary[server].start()
+            else:
+                dictionary[server].mainloop()
         else:
             dictionary[server].mainloop()
 
