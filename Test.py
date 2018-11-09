@@ -6,4 +6,6 @@ from parser_m.date import Date
 import requests
 import bs4
 
-print(b.select(".sub"))
+import sys
+
+print(sys.argv)

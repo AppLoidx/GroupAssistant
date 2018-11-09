@@ -52,6 +52,8 @@
   "26": {"name": "Шайхатаров Артур", "vkid": "151533449",
     "settings": {"4all_msg": true, "push": true, "swap_request": true}},
   "27": {"name": "Шаяхметов Ислам", "vkid": null,
+    "settings": {"4all_msg": true, "push": true, "swap_request": true}},
+  "28": {"name": "Мартин Райла", "vkid": "55032163",
     "settings": {"4all_msg": true, "push": true, "swap_request": true}}},
 
   "extended access": ["402109451", "255396611"],
