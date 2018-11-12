@@ -82,6 +82,9 @@ class Assistant:
         """
         print(command)
 
+        self.queue.update_queue()
+        for i in self.queue.get_queue():
+            print(i.get_name())
         if command == "":
             command = "unknown"
         if command is None:
@@ -109,6 +112,7 @@ class Assistant:
                         if self.last_ask_yes_no_ans:
                             if self.queue.exist_check():
                                 command = command.split()
+
                                 self.queue.swap(command[1], command[2])
                                 self.queue.write_queue_on_file()
                                 self.change_mode(ModeEnum.DEFAULT)

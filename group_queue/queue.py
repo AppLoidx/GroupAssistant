@@ -84,8 +84,7 @@ class Queue:
 
             new_list.append(Person(_ID, _NAME, _PASSED))
 
-        if len(new_list) == len(self._queue_list):
-            self._queue_list = new_list
+        self._queue_list = new_list
 
         f.close()
 
