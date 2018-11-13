@@ -116,6 +116,7 @@ class Assistant:
                                 self.queue.write_queue_on_file()
                                 self.change_mode(ModeEnum.DEFAULT)
                                 self.last_ask_yes_no_ans = None
+                                self.queue.update_queue()
                                 return "Вы успешно поменялись с очередью!"
                             else:
                                 self.last_ask_yes_no_ans = None
