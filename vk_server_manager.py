@@ -28,7 +28,7 @@ def run_all(dictionary):
             else:
                 dictionary[server].mainloop()
         else:
-            dictionary[server].start()
+            dictionary[server].mainloop()
 
         print(f"Server {dictionary[server].get_server_name()} started!")
 
