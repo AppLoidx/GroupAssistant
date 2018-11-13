@@ -82,7 +82,6 @@ class Assistant:
         """
         print(command)
 
-        self.queue.update_queue()
         for i in self.queue.get_queue():
             print(i.get_name())
         if command == "":

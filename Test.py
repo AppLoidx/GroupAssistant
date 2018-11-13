@@ -8,4 +8,8 @@ import bs4
 
 import sys
 
-print(sys.argv)
+queue = Queue("groups_list/P3112.json")
+
+queue.new_queue()
+queue.write_queue_on_file()
+queue.update_queue()

@@ -27,7 +27,7 @@ class Queue:
 
     def _set_group_list(self):
         """
-        Получает список группы из файла groupList.txt или groupListWindow.txt в зависимости от кодировки
+        Получает список группы из файла
         :return: сгенерированный список группы с элементами Person
         """
 
@@ -54,7 +54,6 @@ class Queue:
     def write_queue_on_file(self, queue_list=None):
         if queue_list is None:
             queue_list = self._queue_list
-
         f = open("queue.txt", "w", encoding="UTF-8")
         for person in queue_list:
             f.write(str(person.get_id()))
@@ -105,7 +104,10 @@ class Queue:
                 index -= len(group_list)
 
             queue.append(group_list[index])
-
+        t = 1
+        for i in queue:
+            print(str(t) + str(i.get_name()) + " " + str(i.get_id()))
+            t += 1
         return queue
 
     def person_passed(self) -> None:
