@@ -180,7 +180,6 @@ class Assistant:
         if self.now_mode == ModeEnum.YES_NO_ASK:
 
             if command['text'].upper() in ["Y", "YES", "ДА"]:
-                print("yeees")
                 self.now_mode = self.last_mode
                 self.last_ask_yes_no_ans = True
 
@@ -337,7 +336,6 @@ class Assistant:
                 else:
                     return "У вас нет прав для этого метода. Обратитесь к старосте или к моему создателю."
 
-        print(command_type)
         #
         # QUEUE MODE
         #

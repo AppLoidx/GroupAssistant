@@ -105,9 +105,6 @@ class Queue:
 
             queue.append(group_list[index])
         t = 1
-        for i in queue:
-            print(str(t) + str(i.get_name()) + " " + str(i.get_id()))
-            t += 1
         return queue
 
     def person_passed(self) -> None:
