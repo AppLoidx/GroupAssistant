@@ -110,6 +110,7 @@ class Assistant:
                     else:
                         if self.last_ask_yes_no_ans:
                             if self.queue.exist_check():
+                                self.queue.update_queue()
                                 command = command.split()
 
                                 self.queue.swap(command[1], command[2])
@@ -309,7 +310,8 @@ class Assistant:
                                     f"Вы хотите поменяться с"
                                     f" {JSONFile.get_name_by_vkid(self.vkid, self.group_file_name)} "
                                     f"под номером ИСУ {self.isu_id} ? Его место в очереди: "
-                                    f"{self.queue.get_person_queue_position(self.isu_id)}")
+                                    f"{self.queue.get_person_queue_position(self.isu_id)}",
+                                    keyboard=JSONFile.read_keyboard("yes_no_ask.json"))
                             except Exception:
                                 self.now_mode = self.last_mode
                                 self.last_get_number_ans = None
@@ -341,6 +343,8 @@ class Assistant:
         # QUEUE MODE
         #
         if self.now_mode == ModeEnum.QUEUE:
+            if self.queue.exist_check():
+                self.queue.update_queue()
 
             if command_type == CommandEnum.new_queue:
                 if self.queue.exist_check():
@@ -355,6 +359,7 @@ class Assistant:
                                "Обратитесь к старосте или к моему создателю, чтобы создать новую очередь."
                 else:
                     self.queue.new_queue()
+                    self.queue.history.clean()
                     self.queue.write_queue_on_file()
 
                     return "Очередь создана!"
@@ -469,6 +474,7 @@ class Assistant:
                         self.last_ask_yes_no_ans = None
                         self.change_mode(ModeEnum.QUEUE)
                         self.queue.delete_person(self.isu_id)
+                        self.queue.write_queue_on_file()
                         return f"Вы были удалены из очереди."
                     else:
                         self.last_ask_yes_no_ans = None
@@ -486,6 +492,7 @@ class Assistant:
                         self.queue.update_queue()
 
                         self.queue.add_person(self.isu_id)
+                        self.queue.write_queue_on_file()
                         return f"Вы добавлены в конец очереди"
 
                 else:

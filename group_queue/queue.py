@@ -104,7 +104,6 @@ class Queue:
                 index -= len(group_list)
 
             queue.append(group_list[index])
-        t = 1
         return queue
 
     def person_passed(self) -> None:
