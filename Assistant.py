@@ -80,10 +80,7 @@ class Assistant:
         :param from_id: Если None, то сообщение из группы, если есть значение, то личное
         :return: вывод (ответ бота)
         """
-        print(command)
 
-        for i in self.queue.get_queue():
-            print(i.get_name())
         if command == "":
             command = "unknown"
         if command is None:

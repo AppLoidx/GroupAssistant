@@ -46,7 +46,7 @@ class Queue:
         :return: None
         """
         if group_list is None:
-            group_list = self._queue_list
+            group_list = self._set_group_list()
         self._queue_list = self._create_queue(random.randint(0, 27), group_list)
 
         self.history.write("Создана новая очередь")
