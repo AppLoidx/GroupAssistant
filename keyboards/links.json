@@ -4,50 +4,55 @@
     [{
       "action": {
         "type": "text",
-        "label": "/queue"
+        "label": "журнал прога"
       },
       "color": "positive"
     },
       {
         "action": {
           "type": "text",
-          "label": "/question"
+          "label": "журнал инфа"
         },
         "color": "positive"
       },
       {
         "action": {
           "type": "text",
-          "label": "/request"
-        },
-        "color": "positive"
-      },
-      {
-        "action": {
-          "type": "text",
-          "label": "/settings"
+          "label": "журнал опд"
         },
         "color": "positive"
       }],
-
-
-    [
-      {
+    [{
       "action": {
         "type": "text",
-        "label": "расписание"
+        "label": "группа прога"
       },
-      "color": "default"
-    }
-    ],
+      "color": "positive"
+    },
+      {
+        "action": {
+          "type": "text",
+          "label": "группа инфа"
+        },
+        "color": "positive"
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "группа опд"
+        },
+        "color": "positive"
+      }],
     [
       {
         "action": {
           "type": "text",
-          "label": "/ссылки"
+          "label": "/default"
         },
-        "color": "positive"
+        "color": "default"
       }
+
     ]
+
   ]
 }

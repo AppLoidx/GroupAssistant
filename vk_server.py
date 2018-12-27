@@ -104,9 +104,6 @@ class VkServer:
             self.start()
 
         except Exception as e:
-            print("Произошла ошибка")
-            print(e)
-            print("---------")
             self.vk_s.messages.send(peer_id=admin_vk_id,
                                     message="Произошла ошибка! Перезапускаюсь! " + e.__str__())
             self.mainloop(exceptions + 1)

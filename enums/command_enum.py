@@ -23,6 +23,7 @@ class CommandEnum(Enum):
 
     # Links
     get_journal_link = ["журнал", "journal"]
+    get_group_link = ["группа", "group"]
 
     # Работа с очередью
     # Main functions

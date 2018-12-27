@@ -35,6 +35,7 @@ class Assistant:
             CommandEnum.get_java_answer,
             CommandEnum.get_java_question,
             CommandEnum.get_journal_link,
+            CommandEnum.get_group_link
         ]
         self.not_registered = not_registered
         self.now_mode = ModeEnum.DEFAULT
@@ -130,6 +131,7 @@ class Assistant:
         # Mode change
 
         change_mode = self.identify_mode_change(command['text'])
+
         if change_mode[0]:
             if from_id is None:
                 return "В группе доступен только режим очереди!"
@@ -265,18 +267,6 @@ class Assistant:
             if command['text'] in CommandEnum.schedule.value:
                 return self.schedule.get_schedule()
 
-            # journal link
-
-            if len(command['text'].split()) > 1:
-                if command['text'].split()[0] in CommandEnum.get_journal_link.value:
-                    data = JSONFile.read_json("links.json")
-
-                    associate = Associate.get_associate(command['text'].split()[1])
-                    if isinstance(associate, Exception):
-                        return "У меня тут что-то пошло не так... Вы все правильно ввели?"
-                    if associate is None:
-                        return "Не нашла такого журнала в своей базе данных..."
-                    return data['journals'][associate]
         #
         # REQUEST MODE
         #
@@ -499,6 +489,28 @@ class Assistant:
 
                 else:
                     return "Очереди нет"
+
+        #
+        # LINK
+        #
+        if self.now_mode == ModeEnum.LINK:
+            # journal link
+
+            if len(command['text'].split()) > 1:
+                if command['text'].split()[0] in CommandEnum.get_journal_link.value:
+                    data = JSONFile.read_json("links.json")
+
+                elif command['text'].split()[0] in CommandEnum.get_group_link.value:
+                    data = JSONFile.read_json("group_links.json")
+                else:
+                    return "Неверный формат указателя на ссылку"
+
+                associate = Associate.get_associate(command['text'].split()[1])
+                if isinstance(associate, Exception):
+                    return "У меня тут что-то пошло не так... Вы все правильно ввели?"
+                if associate is None:
+                    return "Не нашла такого журнала\\группы в своей базе данных..."
+                return data['journals'][associate]
         #
         # SETTINGS
         #
