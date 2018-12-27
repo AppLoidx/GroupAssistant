@@ -16,7 +16,7 @@ class Messenger:
             msg = self.ids[str(event.object.from_id)].command(
                 Edit.clean_str_from_symbol(event.object.text, "[", "]").strip(" "), from_id)
 
-        if msg.strip("\n") == "" or msg is None:
+        if msg is None or msg.strip("\n") == "":
             msg = "(Пусто)"
 
         assistant_mode = self.ids[str(event.object.from_id)].get_mode()
@@ -37,6 +37,8 @@ class Messenger:
                 keyboard = "request.json"
             elif assistant_mode == ModeEnum.SETTINGS:
                 keyboard = "settings.json"
+            elif assistant_mode == ModeEnum.LINK:
+                keyboard = "links.json"
         if from_id is None:
             if keyboard is not None:
                 self.vk.messages.send(peer_id=event.object.peer_id,
