@@ -32,7 +32,6 @@ class Assistant:
             CommandEnum.get_person_queue_position]
         self.not_registered_commands = [
             CommandEnum.now_mode,
-            CommandEnum.schedule,
             CommandEnum.get_java_answer,
             CommandEnum.get_java_question,
             CommandEnum.get_journal_link,
@@ -138,17 +137,6 @@ class Assistant:
                 self.change_mode(change_mode[1])
                 return "Режим успешно изменён!\n Текущий режим: " + self.now_mode.value[0]
 
-        # Register check
-
-        if self.not_registered:
-            for cmd in self.not_registered_commands:
-                if command['text'] in cmd.value or command['text'].split()[0] in cmd.value:
-                    pass
-                else:
-                    return "Вы не зарегестрированный пользователь, " \
-                           "поэтому вам не доступны команды для редактирования очереди " \
-                           "или другого взаимодействия с группой."
-
         if from_id is None:
             not_possible_command = True
             for cmd in self.from_group_possible_commands:
@@ -223,6 +211,23 @@ class Assistant:
         #
         #              MAIN COMMANDS
         #
+
+
+        # Register check
+
+        if self.not_registered:
+            possible_command = False
+            for cmd in self.not_registered_commands:
+
+                if command['text'] in cmd.value or command['text'].split()[0] in cmd.value:
+                    possible_command = True
+
+            if not possible_command:
+                return "Вы не зарегестрированный пользователь, " \
+                        "поэтому вам не доступны команды для редактирования очереди " \
+                        "или другого взаимодействия с группой."
+
+
 
         #
         # QUESTION MODE
