@@ -60,22 +60,13 @@ class VkServer:
                 if event.group_id:
                     pass
 
-                """
-                vk_s.messages.send(peer_id=event.object.peer_id,
-                message=None)
-                """
-                if True:#event.object.from_id == admin_vk_id:
+                if True:
 
                     if event.object.id == 0:
                         self.messenger.send_message(event.object.from_id, "Сообщения в группе запрещены. "
                                                                           "Пожалуйста, пишите в личные сообщения)))")
                     else:
                         self.messenger.send_message_by_event(event, from_id=event.object.from_id)
-
-                # else:
-                 #    self.messenger.send_message_by_event(event, str(JSONFile.get_name_by_vkid(event.object.from_id,
-                  #                                                                             self.group_file_name)) +
-                    #                                      ", сейчас я нахожусь в тестовом режиме!")
 
     def do_requests_list(self, filename="request_list.json"):
         data = JSONFile.read_json(filename)
@@ -113,6 +104,9 @@ class VkServer:
             self.start()
 
         except Exception as e:
+            print("Произошла ошибка")
+            print(e)
+            print("---------")
             self.vk_s.messages.send(peer_id=admin_vk_id,
                                     message="Произошла ошибка! Перезапускаюсь! " + e.__str__())
             self.mainloop(exceptions + 1)
