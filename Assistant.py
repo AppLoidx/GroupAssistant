@@ -21,6 +21,7 @@ class Assistant:
         self.vkid = vkid
         self.isu_id = isu_id
         self.persons = get_group_persons()
+
         self.from_group_possible_commands = [
             CommandEnum.person_passed,
             CommandEnum.get_queue,
@@ -30,13 +31,14 @@ class Assistant:
             CommandEnum.get_next_person_in_queue,
             CommandEnum.get_last_person_in_queue,
             CommandEnum.get_person_queue_position]
+
         self.not_registered_commands = [
             CommandEnum.now_mode,
             CommandEnum.get_java_answer,
             CommandEnum.get_java_question,
             CommandEnum.get_journal_link,
-            CommandEnum.get_group_link
-        ]
+            CommandEnum.get_group_link]
+
         self.not_registered = not_registered
         self.now_mode = ModeEnum.DEFAULT
         self.last_mode = ModeEnum.DEFAULT
@@ -97,8 +99,6 @@ class Assistant:
             if command[0:2:] == "$$":
                 if command[2:6] == "swap":
 
-                    # TODO: Сделать отправку без ожидания от ввода пользователя
-                    # TODO: Отправить подтверждение смены места в очереди
                     if self.last_ask_yes_no_ans is None:
 
                         self.now_mode = ModeEnum.YES_NO_ASK

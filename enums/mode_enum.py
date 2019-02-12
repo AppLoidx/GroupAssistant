@@ -10,8 +10,10 @@ class ModeEnum(Enum):
     REQUEST = ["режим заявки", "заявка", "request"]
     SETTINGS = ["режим настроек", "settings", "set"]
     LINK = ["режим ссылок", "ссылки", "links", "link"]
+
     GET_NUMBER = ["GET NUMBER"]     # програмный мод
     YES_NO_ASK = ["YES NO ASK"]     # програмный мод
     GET_STRING = ["GET STRING"]
+
     UNKNOWN = ["Unknown"]           # програмный мод
 
